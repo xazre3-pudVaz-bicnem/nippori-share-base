@@ -1,3 +1,4 @@
+import { OTHER_PLANS, withTax, yen } from "@/data/pricing";
 import { SITE } from "@/lib/site";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 
@@ -31,8 +32,27 @@ export function organizationSchema(): Json {
     telephone: SITE.tel,
     address: postalAddress,
     sameAs: [SITE.instagram],
+    // 本格稼働した日（出典は lib/site.ts）
+    foundingDate: SITE.openedOn,
     parentOrganization: { "@type": "Organization", name: SITE.operator },
   };
+}
+
+/** メディア掲載（実際の記事だけ）。記事の本文は持たず、見出しと URL だけを示す */
+function mediaMentions(): Json[] {
+  return SITE.media.map((m) => ({
+    "@type": "NewsArticle",
+    headline: m.title,
+    url: m.url,
+    datePublished: m.date,
+    publisher: { "@type": "Organization", name: m.outlet },
+  }));
+}
+
+/** 料金表（/price）に掲載している税込価格の範囲 */
+function priceRange(): string {
+  const all = OTHER_PLANS.map((p) => withTax(p.ex));
+  return `¥${yen(Math.min(...all))}〜¥${yen(Math.max(...all))}`;
 }
 
 /** 設備。画面（/equipment）に掲載しているものだけ */
@@ -57,7 +77,7 @@ export function localBusinessSchema(): Json {
     description: SITE.description,
     slogan: SITE.tagline,
     url: absoluteUrl("/"),
-    image: [absoluteUrl("/og/default.jpg"), absoluteUrl("/images/space/space-main.jpg")].filter(Boolean),
+    image: ["/og/default.jpg", "/images/space/space-main.jpg", "/images/space/space-large-table.jpg", "/images/access/saito-shoten-exterior.jpg"].map((p) => absoluteUrl(p)).filter(Boolean),
     logo: absoluteUrl("/images/brand/logo-square.jpg"),
     telephone: SITE.tel,
     email: SITE.email,
@@ -68,15 +88,15 @@ export function localBusinessSchema(): Json {
       { "@type": "Place", name: "日暮里" },
       { "@type": "Place", name: "日暮里繊維街" },
     ],
-    // 料金表（/price）に掲載している税抜価格の範囲
-    priceRange: "¥300〜¥20,000",
+    priceRange: priceRange(),
     amenityFeature: AMENITIES.map((name) => ({ "@type": "LocationFeatureSpecification", name, value: true })),
     sameAs: [SITE.instagram],
     parentOrganization: { "@id": id("organization") },
+    subjectOf: mediaMentions(),
     potentialAction: {
       "@type": "ReserveAction",
       target: absoluteUrl("/reserve"),
-      name: "予約する",
+      name: "空き状況を見て予約する",
     },
   };
 }
@@ -140,7 +160,8 @@ export function articleSchema(input: {
     articleSection: input.section,
     inLanguage: "ja",
     mainEntityOfPage: absoluteUrl(input.path),
-    author: { "@type": "Organization", name: SITE.name, url: absoluteUrl("/") },
+    // 書き手は運営している Nippori Share Base 自身（/about に運営の説明がある）
+    author: { "@type": "Organization", "@id": id("organization"), name: SITE.name, url: absoluteUrl("/about") },
     publisher: { "@id": id("organization") },
   };
 }
@@ -155,6 +176,17 @@ export function itemListSchema(name: string, items: { name: string; path?: strin
       name: it.name,
       url: it.path ? absoluteUrl(it.path) : undefined,
     })),
+  };
+}
+
+export function aboutPageSchema(): Json {
+  return {
+    "@type": "AboutPage",
+    name: `${SITE.name} について`,
+    url: absoluteUrl("/about"),
+    inLanguage: "ja",
+    about: { "@id": id("localbusiness") },
+    mainEntity: { "@id": id("organization") },
   };
 }
 

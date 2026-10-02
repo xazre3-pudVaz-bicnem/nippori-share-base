@@ -1,15 +1,32 @@
 /**
  * 料金（単一ソース）。
  *
- * 出典：現在の公式サイト「利用料」「Chum's Sewing Club」ページ、および利用規約（2026-10-02 時点）。
- * 料金表は「税抜き価格」と明記されているので、その表記のまま掲載する。
- * 利用規約に税込で書かれているもの（いとシェア・ミシンガード550・針交換）は税込のまま。
+ * 出典：旧公式サイト（Canva）の「利用料」「Chum's Sewing Club」ページ、および利用規約（2026-10-02 時点）。
  *
- * 料金を改定するときはこのファイルと PRICE_AS_OF を直す。ページ側に金額を直接書かないこと。
+ * 表示の方針
+ * - 旧サイトの料金表は「税抜き価格」で書かれている。このファイルには、その税抜の金額をそのまま持つ（ex）
+ * - 画面には、支払う総額が分かるよう **税込を主、税抜を従** で出す。税込は標準税率 10％ で計算する（withTax）
+ * - 利用規約に税込で書かれているもの（いとシェア・ミシンガード550・針交換）は、税込の金額をそのまま持つ
+ * - 金額を推測で足さない。確認できていない料金（メンターサポート、レーザー加工機など）は載せない
+ *
+ * 料金を改定するときは、このファイルの ex の値と PRICE_AS_OF を直す。ページ側に金額を直接書かないこと
+ * （文章の中で金額に触れるときは priceText() を使う）。
  */
 export const PRICE_AS_OF = "2026-10-02";
 
-/** ミシンを利用する方向け（1人あたり・税抜） */
+/** 消費税率（標準税率） */
+export const TAX_RATE = 0.1;
+
+/** 税抜 → 税込（円未満は四捨五入。現在の料金はすべて割り切れる） */
+export const withTax = (ex: number) => Math.round(ex * (1 + TAX_RATE));
+
+/** 3 桁区切り */
+export const yen = (n: number) => n.toLocaleString("ja-JP");
+
+/** 文章の中で使う表記。例: priceText(2000) → "2,200円（税込）" */
+export const priceText = (ex: number) => `${yen(withTax(ex))}円（税込）`;
+
+/** ミシンを利用する方向け（1人あたり） */
 export const MACHINE_PLANS = {
   slots: [
     { id: "am", name: "Team AM", time: "10:00〜13:30" },
@@ -17,29 +34,31 @@ export const MACHINE_PLANS = {
     { id: "all", name: "All Day", time: "10:00〜17:30" },
   ],
   rows: [
-    { label: "一般価格", prices: ["¥2,000", "¥2,000", "¥4,000"] },
-    { label: "Chum's Sewing Club 会員価格", prices: ["¥1,500", "¥1,500", "¥2,900"] },
+    { id: "general", label: "一般価格", ex: [2000, 2000, 4000] },
+    { id: "member", label: "Chum's Sewing Club 会員価格", ex: [1500, 1500, 2900] },
   ],
   hourly: {
     label: "1時間利用",
-    price: "¥1,000",
+    ex: 1000,
     note: "事前のご予約はお受けしておりません。当日空きがある場合にのみご案内させていただきます。",
   },
   notes: [
-    "税抜き価格です。1人あたりの価格となります。",
+    "1人あたりの料金です。",
     "準備・片付けを含めた利用時間となります。",
     "キャンセル・予約変更は、利用規約をお読みのうえお早めにご連絡ください。",
     "参加費・会費の徴収、商品の販売、その他の収益を伴う活動を目的としたご利用は、原則として貸切利用をご利用ください。",
   ],
 } as const;
 
-/** ミシン利用以外の方向け（税抜） */
+/** ミシン利用以外の方向け */
 export const OTHER_PLANS = [
   {
     id: "break",
     name: "休憩利用",
     reception: "当日受付",
-    price: "¥500 / 1時間",
+    ex: 500,
+    unit: "1時間",
+    from: false,
     priceNote: "ワンドリンク制",
     use: "お買い物の合間の休憩・ご歓談などに",
     includes: "椅子",
@@ -48,7 +67,9 @@ export const OTHER_PLANS = [
     id: "cutting",
     name: "裁断台利用",
     reception: "当日受付",
-    price: "¥300 / 15分",
+    ex: 300,
+    unit: "15分",
+    from: false,
     priceNote: "",
     use: "裁断だけしたい方、繊維街でお買い物された生地のシェアなどに",
     includes: "裁断台、裁ち鋏",
@@ -57,7 +78,9 @@ export const OTHER_PLANS = [
     id: "handmade",
     name: "ハンドメイド利用",
     reception: "事前予約",
-    price: "¥3,000 / 半日",
+    ex: 3000,
+    unit: "半日",
+    from: false,
     priceNote: "グループ利用可",
     use: "編み会やその他ハンドメイド作業などに",
     includes: "大テーブル＋椅子（最大6脚）、作業台＋椅子（最大4脚）、ホワイトボード",
@@ -66,21 +89,33 @@ export const OTHER_PLANS = [
     id: "private",
     name: "貸切利用",
     reception: "事前予約",
-    price: "基本料金 ¥20,000〜",
-    priceNote: "応相談／日・祝利用可",
+    ex: 20000,
+    unit: "",
+    from: true,
+    priceNote: "基本料金。内容により応相談／日・祝利用可",
     use: "ワークショップや展示会などのイベント利用に",
     includes: "応相談",
   },
 ] as const;
 
+export type OtherPlanId = (typeof OTHER_PLANS)[number]["id"];
+
+export const planById = (id: OtherPlanId) => OTHER_PLANS.find((p) => p.id === id)!;
+
+/** 文章用。例: planPriceText("cutting") → "15分 330円（税込）" */
+export function planPriceText(id: OtherPlanId): string {
+  const p = planById(id);
+  const amount = `${yen(withTax(p.ex))}円${p.from ? "〜" : ""}（税込）`;
+  return p.unit ? `${p.unit} ${amount}` : amount;
+}
+
 export const OTHER_PLAN_NOTES = [
-  "税抜き価格です。",
   "当日受付のものは、店頭にてお申し付けください。",
   "準備・片付けを含めた利用時間となります。",
   "キャンセル・予約変更は、利用規約をお読みのうえお早めにご連絡ください。",
 ] as const;
 
-/** 利用規約に定めのあるサービス（税込） */
+/** 利用規約に定めのあるサービス（規約に税込で記載されている） */
 export const OPTIONS = [
   {
     name: "いとシェア（糸貸しサービス）",
@@ -108,14 +143,22 @@ export const CANCEL_POLICY = [
 ] as const;
 
 /** 月額会員「Chum's Sewing Club」 */
+const generalEx = MACHINE_PLANS.rows[0].ex;
+const memberEx = MACHINE_PLANS.rows[1].ex;
+/** 会員になると安くなる額（税込）。Team AM/PM と All Day */
+export const MEMBER_DISCOUNT = {
+  half: withTax(generalEx[0]) - withTax(memberEx[0]),
+  allDay: withTax(generalEx[2]) - withTax(memberEx[2]),
+};
+
 export const CLUB = {
   name: "Chum's Sewing Club",
-  monthly: "月額 ¥700（+tax）",
-  yearly: "年払い ¥8,000（+tax）",
+  monthlyEx: 700,
+  yearlyEx: 8000,
   benefits: [
     {
       title: "Nippori Share Base を会員価格で",
-      body: "ミシン利用が ¥500 OFF（All Day は ¥1,100 OFF）。月2回以上のご利用でお得になります。",
+      body: `ミシン利用が ${yen(MEMBER_DISCOUNT.half)}円引き（All Day は ${yen(MEMBER_DISCOUNT.allDay)}円引き）になります（税込）。月2回以上のご利用でお得です。`,
     },
     {
       title: "齊藤商店でお得にお買い物",

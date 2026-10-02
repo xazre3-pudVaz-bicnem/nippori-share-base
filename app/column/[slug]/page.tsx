@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COLUMN_CATEGORIES, getAllColumns, getColumn, getRelatedColumns } from "@/lib/columns";
+import { IMG } from "@/data/images";
+import { COLUMN_CATEGORIES, COLUMN_TYPES, getAllColumns, getColumn, getRelatedColumns } from "@/lib/columns";
 import { articleSchema } from "@/lib/schema";
 import { buildMetadata, formatDateJa } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Container } from "@/components/ui/Container";
-import { ArrowIcon } from "@/components/ui/Icons";
+import { ArrowIcon, InstagramIcon } from "@/components/ui/Icons";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Photo } from "@/components/ui/Photo";
 import { ColumnBody } from "@/components/sections/ColumnBody";
@@ -26,15 +28,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const column = getColumn(slug);
   if (!column) return {};
-  // 記事タイトルが長いときは「｜Nippori Share Base」を付けない（検索結果で本題が切れないように）
+  // 記事タイトルが長いとき、またはタイトルに店名が入っているときは「｜Nippori Share Base」を付けない
   const width = [...column.title].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 1 : 0.5), 0);
   return buildMetadata({
     title: column.title,
-    rawTitle: width > 24,
+    rawTitle: width > 24 || column.title.includes(SITE.name),
     description: column.description,
     path: `/column/${column.slug}`,
     type: "article",
     og: "column",
+    // 公開日・更新日は記事ファイルの値をそのまま使う（更新していない記事は公開日と同じ）
     publishedTime: column.date,
     modifiedTime: column.updated ?? column.date,
     section: COLUMN_CATEGORIES[column.category].label,
@@ -71,11 +74,11 @@ export default async function ColumnPage({ params }: Props) {
       />
 
       <article>
-        <header className="bg-sun">
+        <header className="pinked bg-sun">
           <div className="mx-auto max-w-3xl px-5 pb-12 pt-5 sm:px-8 sm:pb-16">
             <Breadcrumbs
               crumbs={[
-                { name: "コラム", path: "/column" },
+                { name: "コラム・お知らせ", path: "/column" },
                 { name: category.label, path: `/column/category/${column.category}` },
                 { name: column.title, path },
               ]}
@@ -84,24 +87,24 @@ export default async function ColumnPage({ params }: Props) {
               <Link href={`/column/category/${column.category}`} className="rounded-full bg-white px-3 py-1 text-xs font-bold">
                 {category.label}
               </Link>
+              <span className="text-xs font-bold">{COLUMN_TYPES[column.type].label}</span>
               <time dateTime={column.date}>{formatDateJa(column.date)}</time>
               {column.updated && column.updated !== column.date ? (
                 <span>
                   （更新：<time dateTime={column.updated}>{formatDateJa(column.updated)}</time>）
                 </span>
               ) : null}
-              <span className="text-ink/75">読了目安 約{column.readingMinutes}分</span>
             </p>
             <h1 className="mt-3 text-[1.6rem] leading-[1.5] sm:text-4xl sm:leading-[1.45]">{column.title}</h1>
             <p className="mt-4 text-[0.95rem]">{column.description}</p>
           </div>
         </header>
 
-        <Container size="narrow" className="py-12 sm:py-16">
-          <Photo img={cover} ratio="aspect-[3/2]" priority sizes="(max-width: 831px) 100vw, 704px" />
+        <Container size="narrow" className="py-14 sm:py-20">
+          <Photo img={cover} ratio="aspect-[3/2]" priority swatch="sun" sizes="(max-width: 831px) 100vw, 704px" position="50% 58%" />
 
           {column.headings.length >= 3 ? (
-            <nav aria-label="目次" className="mt-10 rounded-3xl bg-butter p-6 sm:p-8">
+            <nav aria-label="目次" className="mt-12 border-y-2 border-dashed border-ink/25 py-6">
               <p className="font-round text-lg font-bold">目次</p>
               <ol className="mt-3 space-y-2 text-[0.95rem]">
                 {column.headings.map((h, i) => (
@@ -122,8 +125,17 @@ export default async function ColumnPage({ params }: Props) {
             <ColumnBody markdown={column.body} />
           </div>
 
+          {column.instagram ? (
+            <p className="mt-10">
+              <a href={column.instagram} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-ink px-5 font-round text-sm font-bold">
+                <InstagramIcon />
+                このときの様子を Instagram で見る
+              </a>
+            </p>
+          ) : null}
+
           {column.cta ? (
-            <p className="mt-12 text-center">
+            <p className="mt-12">
               <Link href={column.cta.href} className="btn btn-sun">
                 {column.cta.label}
                 <ArrowIcon />
@@ -131,39 +143,45 @@ export default async function ColumnPage({ params }: Props) {
             </p>
           ) : null}
 
-          {/* 書き手の情報（誰が書いているかを明示する） */}
-          <aside className="mt-14 rounded-3xl p-6 shadow-[0_0_0_2px_var(--color-line)] sm:p-8">
+          {/* 書き手の情報：実際にこの場所を運営している Nippori Share Base が公開している記事であることを示す */}
+          <aside className="mt-16 border-t-2 border-ink pt-8" aria-label="この記事を書いた人">
             <p className="eyebrow text-xs text-ash">Written by</p>
-            <p className="mt-1 font-round text-lg font-bold">{SITE.name}</p>
-            <p className="mt-2 text-sm leading-7">
-              日暮里繊維街の生地店・齊藤商店の2階にある、ものづくりのためのシェアスペース。家庭用・職業用・ロック・カバーステッチミシンをそろえ、洋裁やハンドメイド、ワークショップの場として運営しています。
-            </p>
-            <p className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
-              <Link href="/space" className="link">
-                スペースについて
-              </Link>
-              <Link href="/access" className="link">
-                アクセス
-              </Link>
-            </p>
+            <div className="mt-3 flex items-start gap-4">
+              <Image src={IMG.logo.src} alt="" width={72} height={68} className="h-auto w-16 shrink-0" sizes="64px" />
+              <div>
+                <p className="font-round text-lg font-bold">{SITE.name}</p>
+                <p className="mt-1.5 text-sm leading-7">
+                  日暮里繊維街・齊藤商店の2階で、ものづくりのためのシェアスペースを実際に運営しています。家庭用・職業用・ロック・カバーステッチのミシンを置き、洋裁やハンドメイド、ワークショップの場としてひらいています。
+                </p>
+                <p className="mt-1.5 text-xs leading-6 text-ash">〒{SITE.postalCode} {SITE.addressFull}</p>
+                <p className="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                  <Link href="/about" className="link">
+                    私たちについて
+                  </Link>
+                  <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="link">
+                    Instagram
+                  </a>
+                </p>
+              </div>
+            </div>
           </aside>
         </Container>
       </article>
 
       {related.length > 0 ? (
-        <section className="cv bg-butter py-16 sm:py-20">
+        <section className="cv bg-butter py-20 sm:py-24">
           <Container>
-            <h2 className="text-center text-2xl sm:text-3xl">あわせて読みたい</h2>
-            <ul className="mt-10 grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
+            <h2 className="text-2xl sm:text-3xl">あわせて読みたい</h2>
+            <ul className="mt-10 grid gap-x-9 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
               {related.map((c) => (
                 <li key={c.slug}>
                   <ColumnCard column={c} />
                 </li>
               ))}
             </ul>
-            <p className="mt-10 text-center">
-              <Link href="/column" className="btn btn-line">
-                コラム一覧
+            <p className="mt-10">
+              <Link href="/column" className="link inline-flex items-center gap-1.5 text-sm">
+                コラム・お知らせの一覧
                 <ArrowIcon />
               </Link>
             </p>
@@ -171,7 +189,7 @@ export default async function ColumnPage({ params }: Props) {
         </section>
       ) : null}
 
-      <ReserveCta />
+      <ReserveCta variant={column.forOrganizers ? "private" : "general"} />
     </>
   );
 }

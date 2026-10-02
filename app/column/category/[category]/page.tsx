@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { COLUMN_CATEGORIES, getActiveCategories, getColumnsByCategory, type ColumnCategory } from "@/lib/columns";
+import { COLUMN_CATEGORIES, getActiveCategories, getColumnsByCategory, isCategoryIndexable, type ColumnCategory } from "@/lib/columns";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
@@ -28,10 +28,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!key) return {};
   const c = COLUMN_CATEGORIES[key];
   return buildMetadata({
-    title: `${c.label}のコラム`,
+    title: key === "news" ? "お知らせ" : `${c.label}のコラム`,
     description: `${c.description} Nippori Share Base（日暮里繊維街・齊藤商店2F）がお届けする、${c.label}の読みもの一覧です。`,
     path: `/column/category/${key}`,
     og: "column",
+    noindex: !isCategoryIndexable(key),
   });
 }
 
@@ -47,11 +48,11 @@ export default async function ColumnCategoryPage({ params }: Props) {
     <>
       <PageHero
         crumbs={[
-          { name: "コラム", path: "/column" },
+          { name: "コラム・お知らせ", path: "/column" },
           { name: c.label, path: `/column/category/${key}` },
         ]}
         en="Column"
-        title={`${c.label}のコラム`}
+        title={key === "news" ? "お知らせ" : `${c.label}のコラム`}
         lead={c.description}
       />
 
@@ -66,9 +67,9 @@ export default async function ColumnCategoryPage({ params }: Props) {
             ))}
           </ul>
 
-          <nav aria-label="ほかのカテゴリ" className="mt-16 rounded-3xl bg-butter p-6 text-center sm:p-8">
+          <nav aria-label="ほかのカテゴリ" className="mt-16 border-t-2 border-dashed border-ink/25 pt-8">
             <h2 className="text-lg">ほかのカテゴリ</h2>
-            <ul className="mt-4 flex flex-wrap justify-center gap-2.5">
+            <ul className="mt-4 flex flex-wrap gap-2.5">
               {others.map((k) => (
                 <li key={k}>
                   <Link href={`/column/category/${k}`} className="btn btn-line min-h-11 px-5 py-1 text-sm">
@@ -87,7 +88,7 @@ export default async function ColumnCategoryPage({ params }: Props) {
         </Container>
       </section>
 
-      <ReserveCta />
+      <ReserveCta variant={key === "workshop" || key === "event" ? "private" : "general"} />
     </>
   );
 }

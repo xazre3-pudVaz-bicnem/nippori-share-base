@@ -1,15 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MACHINE_CATEGORIES } from "@/data/machines";
+import { ArrowIcon } from "@/components/ui/Icons";
 
 /**
- * 「使えるミシン」4種類。現在の公式サイトと同じ、花形に切り抜いた写真＋3つのポイント＋黄色いボタン。
- * ボタンは /sewing-machine の各種類の位置へ移動する。
- * スマホでは写真を左、文字を右に置く（2列に詰めると箇条書きが折り返して読みにくいため）。
+ * 「使えるミシン」4種類。旧サイトと同じ、花形に切り抜いた写真＋3つのポイント。
+ * リンクは /sewing-machine の各種類の位置へ移動する。
+ * スマホでは写真を左、文字を右に置き、リンクは文字の下の小さなテキストリンクにする
+ * （黄色い大きなボタンが 4 つ縦に並ぶと、画面がボタンだらけになるため）。PC では旧サイトと同じ黄色いボタン。
  */
 export function MachineTypeGrid({ headingLevel: H = "h3" }: { headingLevel?: "h3" | "h4" }) {
   return (
-    <ul className="grid gap-y-9 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-4">
+    <ul className="grid gap-y-8 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-12 lg:grid-cols-4">
       {MACHINE_CATEGORIES.map((c) => {
         const m = c.machines[0];
         return (
@@ -36,10 +38,14 @@ export function MachineTypeGrid({ headingLevel: H = "h3" }: { headingLevel?: "h3
                   <li key={p}>・{p}</li>
                 ))}
               </ul>
+              <Link
+                href={`/sewing-machine#${c.id}`}
+                className="mt-1.5 inline-flex items-center gap-1.5 py-1.5 text-[0.86rem] font-bold underline decoration-sun-deep decoration-[3px] underline-offset-4 sm:mt-4 sm:min-h-11 sm:w-full sm:max-w-[15rem] sm:justify-center sm:rounded-full sm:bg-sun-deep sm:px-3 sm:font-round sm:text-[0.92rem] sm:tracking-wider sm:no-underline"
+              >
+                {c.short === "カバステ" ? "カバーステッチ" : c.name}一覧
+                <ArrowIcon className="size-4 sm:hidden" />
+              </Link>
             </div>
-            <Link href={`/sewing-machine#${c.id}`} className="btn btn-sun col-span-2 mt-4 min-h-11 w-full text-[0.95rem] sm:max-w-[15rem]">
-              {c.name}一覧
-            </Link>
           </li>
         );
       })}

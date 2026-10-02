@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MAIN_NAV, SUB_NAV } from "@/lib/nav";
-import { RESERVE_PATH, SITE, telHref } from "@/lib/site";
+import { CTA_LABEL, PRIVATE_PATH, RESERVE_PATH, SITE, telHref } from "@/lib/site";
 
 /**
  * スマホ・タブレット用のメニュー。
@@ -55,46 +55,47 @@ export function MobileMenu() {
         }}
         className="absolute inset-x-0 top-full h-[calc(100dvh-3.75rem)] overflow-y-auto overscroll-contain bg-sun"
       >
-        <nav aria-label="メインメニュー" className="mx-auto max-w-xl px-5 pb-16 pt-6">
-          <ul className="divide-y-2 divide-dashed divide-ink/25">
+        <nav aria-label="メインメニュー" className="mx-auto max-w-xl px-5 pb-16 pt-5">
+          <ul className="rows">
             <li>
               <Link href="/" className="flex items-baseline justify-between py-3.5">
                 <span className="font-round text-lg font-bold">ホーム</span>
-                <span className="eyebrow text-xs text-ash">Home</span>
+                <span className="eyebrow text-xs text-ink/70">Home</span>
               </Link>
             </li>
             {MAIN_NAV.map((item) => (
               <li key={item.href}>
-                <Link
-                  href={item.href}
-                  aria-current={pathname === item.href ? "page" : undefined}
-                  className="flex items-baseline justify-between gap-4 py-3.5"
-                >
+                <Link href={item.href} aria-current={pathname === item.href ? "page" : undefined} className="flex items-baseline justify-between gap-4 py-3.5">
                   <span>
                     <span className="font-round text-lg font-bold">{item.label}</span>
-                    {item.description ? <span className="mt-0.5 block text-xs text-ash">{item.description}</span> : null}
+                    {item.description ? <span className="mt-0.5 block text-xs text-ink/75">{item.description}</span> : null}
                   </span>
-                  <span className="eyebrow shrink-0 text-xs text-ash">{item.en}</span>
+                  <span className="eyebrow shrink-0 text-xs text-ink/70">{item.en}</span>
                 </Link>
               </li>
             ))}
           </ul>
 
-          <ul className="mt-6 grid grid-cols-2 gap-2.5">
+          <ul className="mt-6 grid grid-cols-2 gap-x-4">
             {SUB_NAV.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="block rounded-2xl bg-cream px-3 py-3 text-center font-round text-sm font-bold">
+                <Link href={item.href} className="block py-2.5 font-round text-[0.95rem] font-bold underline decoration-ink/30 decoration-2 underline-offset-4">
                   {item.label}
                 </Link>
               </li>
             ))}
           </ul>
 
-          <Link href={RESERVE_PATH} className="btn btn-ink mt-7 w-full text-lg">
-            予約する
-          </Link>
+          <div className="mt-7 grid gap-3">
+            <Link href={RESERVE_PATH} className="btn btn-ink w-full text-lg">
+              {CTA_LABEL.general}
+            </Link>
+            <Link href={PRIVATE_PATH} className="btn btn-cream w-full">
+              {CTA_LABEL.private}
+            </Link>
+          </div>
           <p className="mt-6 text-center text-sm leading-7">
-            {SITE.addressFull}
+            〒{SITE.postalCode} {SITE.addressFull}
             <br />
             <a href={telHref} className="link">
               {SITE.tel}

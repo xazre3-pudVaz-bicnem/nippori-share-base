@@ -3,6 +3,7 @@ import { preload } from "react-dom";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { MobileCta } from "@/components/layout/MobileCta";
 import { RevealObserver } from "@/components/layout/RevealObserver";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { graph, localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/schema";
@@ -12,7 +13,7 @@ import { SITE } from "@/lib/site";
 export const metadata: Metadata = {
   metadataBase: SITE_URL ? new URL(SITE_URL) : undefined,
   title: {
-    default: `日暮里のレンタルスペース・ミシン・洋裁｜${SITE.name}`,
+    default: `日暮里のレンタルスペース・ミシン｜${SITE.name}`,
     template: "%s",
   },
   description: SITE.description,
@@ -25,8 +26,8 @@ export const metadata: Metadata = {
   openGraph: { siteName: SITE.name, locale: "ja_JP", type: "website" },
   twitter: { card: "summary_large_image" },
   formatDetection: { telephone: false, address: false, email: false },
-  // Search Console の所有権確認（環境変数に値があるときだけ出力する）
-  verification: { google: process.env.GOOGLE_SITE_VERIFICATION || undefined },
+  // Search Console の所有権確認。値があるときだけ <meta name="google-site-verification"> を出す（空のタグは出さない）
+  verification: { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || process.env.GOOGLE_SITE_VERIFICATION || undefined },
 };
 
 export const viewport: Viewport = {
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         */}
         <main id="main">{children}</main>
         <Footer />
+        <MobileCta />
         <RevealObserver />
         <JsonLd data={graph(organizationSchema(), localBusinessSchema(), websiteSchema())} />
       </body>

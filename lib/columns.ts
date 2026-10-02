@@ -20,23 +20,45 @@ export const COLUMN_CATEGORIES = {
   workshop: { label: "ワークショップ", description: "教えたい人・集まりたい人のための、会場選びと準備。" },
   monozukuri: { label: "ものづくり", description: "道具や場所との付き合い方。つくることを続けるための考え方。" },
   event: { label: "イベント", description: "展示会・販売会・交流会をひらくための段取り。" },
+  news: { label: "お知らせ", description: "Nippori Share Base からのお知らせと、スペースで起きたできごと。" },
 } as const;
 
 export type ColumnCategory = keyof typeof COLUMN_CATEGORIES;
+
+/**
+ * 記事の種類。書き分けることで「検索向けの記事だけが並ぶサイト」にしない。
+ * - report … 一次情報。スペースで実際にあったこと（開催レポート、縫ってみた記録、新しい道具、お知らせ）。いちばん大事
+ * - local …… 地域の記事。日暮里繊維街や奥日暮里のこと
+ * - guide …… 調べものに答える記事。ミシンの種類や選び方など
+ */
+export const COLUMN_TYPES = {
+  report: { label: "できごと・お知らせ", lead: "Nippori Share Base で実際にあったこと。イベントの記録や、新しい道具のお知らせです。" },
+  local: { label: "日暮里のこと", lead: "生地の街・日暮里繊維街の歩き方と楽しみ方。" },
+  guide: { label: "ミシンと洋裁の読みもの", lead: "ミシンの種類や選び方、作業のコツ。" },
+} as const;
+
+export type ColumnType = keyof typeof COLUMN_TYPES;
+export const COLUMN_TYPE_ORDER: ColumnType[] = ["report", "local", "guide"];
 
 export type ColumnMeta = {
   slug: string;
   title: string;
   description: string;
-  /** YYYY-MM-DD */
+  /** 公開日 YYYY-MM-DD。実際に公開した日を書く（検索のために変えない） */
   date: string;
+  /** 内容を実際に直した日。直していないのに書き換えない */
   updated?: string;
   category: ColumnCategory;
+  type: ColumnType;
   tags: string[];
   /** data/images.ts の IMG のキー */
   cover: string;
   /** 記事の最後に案内するページ */
   cta?: { href: string; label: string };
+  /** 関連する Instagram の投稿（report の記事で、写真や動画を見てもらうためのリンク） */
+  instagram?: string;
+  /** 貸切・イベントの相談へ案内する記事（ワークショップ・イベント向け）なら true */
+  forOrganizers: boolean;
   readingMinutes: number;
   /** 同じ日付の記事の並び順（小さいほど先）。省略時は 999 */
   order: number;
@@ -46,6 +68,9 @@ export type Column = ColumnMeta & { body: string; headings: { id: string; text: 
 
 function isCategory(v: unknown): v is ColumnCategory {
   return typeof v === "string" && v in COLUMN_CATEGORIES;
+}
+function isType(v: unknown): v is ColumnType {
+  return typeof v === "string" && v in COLUMN_TYPES;
 }
 
 function toDate(v: unknown): string {
@@ -65,21 +90,32 @@ function load(file: string): Column {
   if (!isCategory(data.category)) {
     throw new Error(`[column] ${file}: category "${data.category}" は未定義です（lib/columns.ts の COLUMN_CATEGORIES を参照）`);
   }
+  if (data.type && !isType(data.type)) {
+    throw new Error(`[column] ${file}: type "${data.type}" は未定義です（report / local / guide のいずれか）`);
+  }
+  const date = toDate(data.date);
+  const updated = data.updated ? toDate(data.updated) : undefined;
+  if (updated && updated < date) throw new Error(`[column] ${file}: updated（${updated}）が date（${date}）より前になっています`);
 
   const body = content.trim();
   const headings = [...body.matchAll(/^##\s+(.+)$/gm)].map((m, i) => ({ id: `sec-${i + 1}`, text: m[1].trim() }));
-  const chars = body.replace(/[#*>\-\s|`\[\]()]/g, "").length;
+  const chars = body.replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/[#*>\-\s|`\[\]()]/g, "").length;
+  const category = data.category;
 
   return {
     slug,
     title: String(data.title),
     description: String(data.description),
-    date: toDate(data.date),
-    updated: data.updated ? toDate(data.updated) : undefined,
-    category: data.category,
+    date,
+    updated,
+    category,
+    // 省略したときは、カテゴリから決める
+    type: isType(data.type) ? data.type : category === "news" ? "report" : category === "textile-town" ? "local" : "guide",
     tags: Array.isArray(data.tags) ? data.tags.map(String) : [],
     cover: String(data.cover ?? "spaceMain"),
     cta: data.cta && data.cta.href && data.cta.label ? { href: String(data.cta.href), label: String(data.cta.label) } : undefined,
+    instagram: typeof data.instagram === "string" && data.instagram.startsWith("https://www.instagram.com/") ? data.instagram : undefined,
+    forOrganizers: category === "workshop" || category === "event",
     readingMinutes: Math.max(1, Math.round(chars / 500)),
     order: typeof data.order === "number" ? data.order : 999,
     body,
@@ -119,9 +155,18 @@ export function getActiveCategories(): ColumnCategory[] {
   return (Object.keys(COLUMN_CATEGORIES) as ColumnCategory[]).filter((k) => used.has(k));
 }
 
-/** 同じカテゴリを優先して関連記事を選ぶ */
+/**
+ * カテゴリ一覧を検索結果に出すのは、記事が 3 本以上あるカテゴリだけ。
+ * 1〜2 本しかない一覧は、記事ページとほぼ同じ内容になるので noindex にする（ページ自体は見られる。記事が増えたら自動で解除）。
+ */
+export const CATEGORY_INDEX_MIN = 3;
+export function isCategoryIndexable(category: ColumnCategory): boolean {
+  return getColumnsByCategory(category).length >= CATEGORY_INDEX_MIN;
+}
+
+/** 同じカテゴリ・同じタグを優先して関連記事を選ぶ */
 export function getRelatedColumns(column: Column, limit = 3): Column[] {
   const others = getAllColumns().filter((c) => c.slug !== column.slug);
-  const score = (c: Column) => (c.category === column.category ? 2 : 0) + c.tags.filter((t) => column.tags.includes(t)).length;
+  const score = (c: Column) => (c.category === column.category ? 2 : 0) + (c.type === column.type ? 1 : 0) + c.tags.filter((t) => column.tags.includes(t)).length;
   return others.sort((a, b) => score(b) - score(a)).slice(0, limit);
 }

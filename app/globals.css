@@ -195,6 +195,60 @@
     mask-repeat: no-repeat;
   }
 
+  /*
+   * ピンキングばさみで切った布の端。黄色い帯の下端に付けて、次の白い区画との境目にする
+   * （直線で区切るより、布を切って並べたように見える）。付ける要素は position: relative にすること。
+   */
+  .pinked {
+    position: relative;
+    z-index: 1;
+  }
+  .pinked::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: calc(100% - 1px);
+    height: 11px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='11' viewBox='0 0 22 11'%3E%3Cpath d='M0 0h22L11 11z' fill='%23fee65c'/%3E%3C/svg%3E") repeat-x;
+    pointer-events: none;
+  }
+
+  /*
+   * 写真の後ろに、布の見本のような色の面を少しずらして敷く（影の代わり）。
+   * 写真そのものではなく、写真を包む外側の要素に付ける。色は --swatch で変えられる。
+   */
+  .swatch {
+    position: relative;
+    isolation: isolate;
+  }
+  .swatch::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: 1rem;
+    background: var(--swatch, var(--color-sun));
+    transform: translate(10px, 10px);
+  }
+  @media (min-width: 48rem) {
+    .swatch::before {
+      transform: translate(16px, 16px);
+    }
+  }
+
+  /* 文章の行の長さ（日本語で 1 行 36〜40 字前後）。長い説明文はこの幅に収める */
+  .measure {
+    max-width: 38em;
+  }
+
+  /* 破線で区切る一覧（カードの枠の代わり） */
+  .rows > * {
+    border-bottom: 2px dashed rgb(35 31 32 / 0.22);
+  }
+  .rows > *:first-child {
+    border-top: 2px dashed rgb(35 31 32 / 0.22);
+  }
+
   /* ロゴタイトル（Train One はラテン文字のみ。日本語には当てない） */
   .display {
     font-family: var(--font-display);

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { EQUIPMENT } from "@/data/equipment";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
+import { ALL_MACHINE_NAMES, LIMITED_MACHINES, MACHINE_CATEGORIES } from "@/data/machines";
 import { itemListSchema } from "@/lib/schema";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
@@ -11,127 +12,185 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FaqList } from "@/components/sections/FaqList";
+import { MachineCard } from "@/components/sections/MachineCard";
 import { PageHero } from "@/components/sections/PageHero";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 
+/**
+ * 担当する検索意図：日暮里 ミシン 設備／日暮里 洋裁 設備 と、設備名・機種名での検索。
+ * 機種ごとの説明（旧サイトのミシン一覧の文章）はこのページにまとめている。
+ * 「日暮里でミシンを使える場所」という探し方への答えは /sewing-machine の担当。
+ */
 export const metadata: Metadata = buildMetadata({
-  title: "設備・道具一覧｜ミシン・裁断台・レーザー加工機",
+  title: "日暮里のミシン・洋裁設備｜機種と道具の一覧",
   description:
-    "Nippori Share Base で使える設備の一覧。家庭用・職業用・ロック・カバーステッチミシン、アイロン、裁断台、作業台、レーザー加工機、カッティングマシーン。それぞれの用途を初心者向けに解説します。",
+    "Nippori Share Base の設備一覧。JANOME・JUKI・brother・baby lock の家庭用／職業用／ロック／カバーステッチミシンの機種名と特徴、アイロン、裁断台、レーザー加工機、カッティングマシーンを紹介します。",
   path: "/equipment",
   og: "sewing-machine",
-  keywords: ["日暮里 ミシン", "日暮里 ロックミシン", "日暮里 レーザー加工機", "日暮里 裁断台", "日暮里 作業スペース"],
+  keywords: ["日暮里 ミシン 設備", "日暮里 洋裁 設備", "日暮里 ロックミシン", "日暮里 カバーステッチミシン", "日暮里 レーザー加工機"],
 });
 
-const SEWING = EQUIPMENT.slice(0, 4);
 const TOOLS = EQUIPMENT.slice(4, 8);
 const DIGITAL = EQUIPMENT.slice(8);
+const whatOf = (categoryId: string) => EQUIPMENT.find((e) => e.id === `${categoryId}-machine`)?.what ?? "";
 
-function EquipmentCard({ e }: { e: (typeof EQUIPMENT)[number] }) {
+function EquipmentRow({ e }: { e: (typeof EQUIPMENT)[number] }) {
   return (
-    <li id={e.id} className="flex scroll-mt-28 flex-col rounded-3xl bg-white p-6 shadow-[0_0_0_2px_var(--color-line)] sm:p-7" data-reveal>
-      <p className="eyebrow text-xs text-ash">{e.en}</p>
-      <h3 className="mt-1 text-xl">{e.name}</h3>
-      <p className="mt-3 text-[0.95rem]">{e.what}</p>
-      <p className="mt-4 text-xs font-bold tracking-wider">こんな制作に</p>
-      <ul className="mt-2 flex flex-wrap gap-2 text-sm">
-        {e.goodFor.map((g) => (
-          <li key={g} className="rounded-full bg-cream px-3 py-1">
-            {g}
-          </li>
-        ))}
-      </ul>
-      {e.ask ? <p className="mt-4 rounded-2xl bg-butter px-4 py-3 text-sm leading-6">＊{e.ask}</p> : null}
-      {e.link ? (
-        <p className="mt-auto pt-4">
-          <Link href={e.link.href} className="link inline-flex items-center gap-1.5 text-sm">
+    <div id={e.id} className="grid scroll-mt-28 gap-x-10 gap-y-2 py-7 md:grid-cols-[15rem_1fr]" data-reveal>
+      <dt>
+        <span className="eyebrow block text-xs text-ash">{e.en}</span>
+        <span className="font-round text-xl font-bold">{e.name}</span>
+      </dt>
+      <dd className="text-[0.95rem]">
+        <p className="measure">{e.what}</p>
+        <p className="measure mt-2 text-sm text-ash">向いている作業：{e.goodFor.join("、")}</p>
+        {e.ask ? <p className="mt-2 text-sm">＊{e.ask}</p> : null}
+        {e.link ? (
+          <Link href={e.link.href} className="link mt-2 inline-flex items-center gap-1.5 text-sm">
             {e.link.label}
             <ArrowIcon />
           </Link>
-        </p>
-      ) : null}
-    </li>
+        ) : null}
+      </dd>
+    </div>
   );
 }
 
 export default function EquipmentPage() {
-  const faqs = pickFaqs(["other-equipment", "break-machine", "cutting-only", "bring"]);
+  const faqs = pickFaqs(["other-equipment", "break-machine", "cutting-only"]);
   return (
     <>
-      <JsonLd data={{ "@context": "https://schema.org", ...itemListSchema("Nippori Share Base の設備・道具", EQUIPMENT.map((e) => ({ name: e.name }))) }} />
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          ...itemListSchema("Nippori Share Base の設備・ミシンの機種", [...ALL_MACHINE_NAMES, ...[...TOOLS, ...DIGITAL].map((e) => e.name)].map((name) => ({ name }))),
+        }}
+      />
 
       <PageHero
         crumbs={[{ name: "設備・道具", path: "/equipment" }]}
         en="Equipment"
         title={
           <>
-            ミシンからレーザー加工機まで。
+            ミシンと洋裁の設備一覧。
             <br />
-            使える設備と道具
+            機種名と、使える道具
           </>
         }
-        lead="Nippori Share Base にある、ものづくりのための設備をまとめました。それぞれ「どんな道具で、何を作るのに向いているか」を、はじめての方にもわかるように説明します。"
+        lead="Nippori Share Base にある設備を、機種名まで含めてまとめました。それぞれ「どんな道具で、何を作るのに向いているか」を、はじめての方にもわかるように説明します。"
         img={IMG.shelfLock}
         position="50% 60%"
-      />
-
-      <section className="py-16 sm:py-24">
-        <Container>
-          <SectionHeading en="Sewing machines" title="ミシン（4種類）" lead="縫い方の得意分野が異なる4種類。作るものに合わせて使い分けます。" />
-          <ul className="mt-10 grid gap-5 sm:mt-14 md:grid-cols-2">
-            {SEWING.map((e) => (
-              <EquipmentCard key={e.id} e={e} />
-            ))}
+      >
+        <nav aria-label="設備の種類">
+          <ul className="flex flex-wrap gap-2.5">
+            <li>
+              <a href="#machines" className="btn btn-cream min-h-11 px-5 py-1 text-sm">
+                ミシンの機種
+              </a>
+            </li>
+            <li>
+              <a href="#tools" className="btn btn-cream min-h-11 px-5 py-1 text-sm">
+                道具・作業台
+              </a>
+            </li>
+            <li>
+              <a href="#digital" className="btn btn-cream min-h-11 px-5 py-1 text-sm">
+                レーザー加工機ほか
+              </a>
+            </li>
           </ul>
-          <p className="mt-9 text-center">
-            <Link href="/sewing-machine" className="btn btn-sun">
-              機種の一覧を見る
-              <ArrowIcon />
+        </nav>
+      </PageHero>
+
+      {/* ミシンの機種 */}
+      <section id="machines" className="scroll-mt-20 py-20 sm:py-28">
+        <Container>
+          <SectionHeading align="left" en="Sewing machines" title="ミシンの機種" lead="縫い方の得意分野が異なる4種類。メーカーと機種名、それぞれの特徴です。" />
+
+          {MACHINE_CATEGORIES.map((c) => (
+            <div key={c.id} id={`${c.id}-machine`} className="mt-16 scroll-mt-28 sm:mt-20">
+              <div className="flex items-center gap-4 sm:gap-8">
+                <h3 className="shrink-0 text-2xl sm:text-3xl">{c.name}</h3>
+                <span className="stitch flex-1 text-ink/35" aria-hidden />
+              </div>
+              <p className="measure mt-4 text-[0.95rem]">{whatOf(c.id)}</p>
+              <ul className={`mt-8 grid gap-6 sm:grid-cols-2 ${c.machines.length === 2 ? "lg:max-w-[52rem]" : "lg:grid-cols-3"}`}>
+                {c.machines.map((m) => (
+                  <li key={m.id}>
+                    <MachineCard machine={m} categoryName={c.name} headingLevel="h4" />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+
+          <div id="limited-machine" className="mt-16 scroll-mt-28 sm:mt-20">
+            <div className="flex items-center gap-4 sm:gap-8">
+              <h3 className="shrink-0 text-2xl sm:text-3xl">期間限定のミシン</h3>
+              <span className="stitch flex-1 text-ink/35" aria-hidden />
+            </div>
+            <p className="measure mt-4 text-[0.95rem]">HappyJapan 様よりお借りしている SINGER のミシンです。設置期間が限られるため、使ってみたい機種がある方は、ご予約時にお問い合わせください。</p>
+            <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {LIMITED_MACHINES.map((m) => (
+                <li key={m.id}>
+                  <MachineCard machine={m} categoryName="期間限定ミシン" headingLevel="h4" square />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <p className="mt-14 text-[0.95rem]">
+            ミシンの使い方・料金・予約の流れは
+            <Link href="/sewing-machine" className="link">
+              ミシンのページ
             </Link>
+            でご案内しています。
           </p>
         </Container>
       </section>
 
-      <section className="bg-sun py-16 sm:py-24">
+      {/* 道具と台 */}
+      <section id="tools" className="pinked scroll-mt-20 bg-sun py-20 sm:py-28">
         <Container>
-          <SectionHeading en="Tools & tables" title="洋裁の道具と、作業する台" lead="縫う前後の工程を支える道具です。ミシンと同じくらい、仕上がりを左右します。" />
-          <ul className="mt-10 grid gap-5 sm:mt-14 md:grid-cols-2">
+          <SectionHeading align="left" en="Tools & tables" title="洋裁の道具と、作業する台" lead="縫う前後の工程を支える道具です。ミシンと同じくらい、仕上がりを左右します。" />
+          <dl className="rows mt-10 [&>*]:border-ink/30">
             {TOOLS.map((e) => (
-              <EquipmentCard key={e.id} e={e} />
+              <EquipmentRow key={e.id} e={e} />
             ))}
-          </ul>
+          </dl>
         </Container>
       </section>
 
-      <section className="cv py-16 sm:py-24">
-        <Container>
-          <div className="grid items-center gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:gap-14">
-            <div data-reveal>
-              <Photo img={IMG.sceneLaser} ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 440px" />
-            </div>
-            <div>
-              <SectionHeading align="left" en="Digital fabrication" title="洋裁以外のものづくりに" lead="レーザー加工機やカッティングマシーンなど、洋裁以外のものづくりも楽しめます。写真は、レーザー加工した木のパーツを使ったワークショップの様子です。" />
-              <ul className="mt-8 grid gap-5">
-                {DIGITAL.map((e) => (
-                  <EquipmentCard key={e.id} e={e} />
-                ))}
-              </ul>
-            </div>
+      {/* デジタル工作 */}
+      <section id="digital" className="scroll-mt-20 py-20 sm:py-28">
+        <Container className="grid items-start gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
+          <div data-reveal>
+            <Photo img={IMG.sceneLaser} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 420px" />
+            <p className="mt-4 text-[0.8rem] leading-6 sm:text-sm">レーザー加工した木のパーツを使ったワークショップの様子。</p>
+          </div>
+          <div>
+            <SectionHeading align="left" en="Digital fabrication" title="洋裁以外のものづくりに" lead="レーザー加工機やカッティングマシーンなど、洋裁以外のものづくりも楽しめます。" />
+            <dl className="rows mt-8">
+              {DIGITAL.map((e) => (
+                <EquipmentRow key={e.id} e={e} />
+              ))}
+            </dl>
           </div>
         </Container>
       </section>
 
-      <section className="cv bg-butter py-16 sm:py-24">
+      {/* お願い */}
+      <section className="cv bg-butter py-20 sm:py-28">
         <Container size="narrow">
-          <SectionHeading en="Please note" title="設備を使うときのお願い" />
-          <ul className="mt-9 space-y-3 text-[0.95rem]">
+          <SectionHeading align="left" en="Please note" title="設備を使うときのお願い" />
+          <ul className="rows mt-9 text-[0.95rem]">
             {[
               "設備は多くの方が共同で使うものです。譲り合いながら、大切にお使いください。",
               "初めて使う機種は、スタッフの説明または案内を確認してからお使いください。",
               "異音や不具合を感じたら、そのまま使い続けず、すぐにスタッフへお知らせください。",
               "使い終わった設備・備品は元の場所へ。備品や道具の持ち出しはできません。",
             ].map((t) => (
-              <li key={t} className="rounded-2xl bg-white px-5 py-4 shadow-[0_0_0_2px_var(--color-line)]" data-reveal>
+              <li key={t} className="py-4" data-reveal>
                 {t}
               </li>
             ))}
@@ -146,16 +205,16 @@ export default function EquipmentPage() {
         </Container>
       </section>
 
-      <section className="cv py-16 sm:py-24">
+      <section className="cv py-20 sm:py-28">
         <Container size="narrow">
-          <SectionHeading en="FAQ" title="設備についてのよくある質問" />
-          <div className="mt-10">
+          <SectionHeading align="left" en="FAQ" title="設備についてのよくある質問" />
+          <div className="mt-9">
             <FaqList items={faqs} />
           </div>
         </Container>
       </section>
 
-      <ReserveCta />
+      <ReserveCta variant="general" />
     </>
   );
 }

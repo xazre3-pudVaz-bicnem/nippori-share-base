@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { IMG, type Img } from "@/data/images";
-import { COLUMN_CATEGORIES, type ColumnMeta } from "@/lib/columns";
+import { COLUMN_CATEGORIES, COLUMN_TYPES, type ColumnMeta } from "@/lib/columns";
 import { formatDateJa } from "@/lib/seo";
 import { Photo } from "@/components/ui/Photo";
 
@@ -19,10 +19,10 @@ export function ColumnCard({ column, headingLevel: H = "h3" }: { column: ColumnM
           alt=""
           ratio="aspect-[3/2]"
           sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 360px"
-          className="rounded-3xl transition-transform duration-500 group-hover:-translate-y-1"
+          className="rounded-2xl transition-transform duration-500 group-hover:-translate-y-1"
         />
         <p className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
-          <span className="rounded-full bg-sun px-3 py-0.5 font-bold">{COLUMN_CATEGORIES[column.category].label}</span>
+          <span className="rounded-full bg-sun px-3 py-0.5 font-bold">{column.type === "report" ? COLUMN_TYPES.report.label : COLUMN_CATEGORIES[column.category].label}</span>
           <time dateTime={column.date} className="text-ash">
             {formatDateJa(column.date)}
           </time>

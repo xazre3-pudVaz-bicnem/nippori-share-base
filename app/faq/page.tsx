@@ -46,12 +46,12 @@ export default function FaqPage() {
       </PageHero>
 
       {FAQ_GROUPS.map((g, i) => (
-        <section key={g.id} id={g.id} className={`scroll-mt-20 py-14 sm:py-20 ${i % 2 === 0 ? "bg-butter" : "bg-white"} ${i > 0 ? "cv" : ""}`}>
+        <section key={g.id} id={g.id} className={`scroll-mt-20 py-16 sm:py-24 ${i % 2 === 1 ? "bg-butter" : "bg-white"} ${i > 0 ? "cv" : ""}`}>
           <Container size="narrow">
             <p className="eyebrow text-sm text-ash">{g.en}</p>
             <h2 className="mt-1 text-2xl sm:text-3xl">{g.title}</h2>
             <div className="stitch mt-4 w-28" aria-hidden />
-            <div className="mt-8">
+            <div className="mt-7">
               <FaqList items={g.items} />
             </div>
           </Container>
@@ -87,7 +87,7 @@ export default function FaqPage() {
         </Container>
       </section>
 
-      <ReserveCta />
+      <ReserveCta variant="both" />
     </>
   );
 }

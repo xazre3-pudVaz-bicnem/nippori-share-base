@@ -8,7 +8,12 @@
  * - 他のページは pickFaqs() で必要な質問を選んで「表示だけ」する
  *
  * a はプレーンテキスト。構造化データにも同じ文字列を使うので、画面と一致する。
+ * 金額は data/pricing.ts から作る（税込で書く。ここに数字を直接書かない）。
  */
+import { CLUB, MACHINE_PLANS, planPriceText, priceText } from "@/data/pricing";
+
+const general = MACHINE_PLANS.rows[0].ex;
+
 export type Faq = { id: string; q: string; a: string; link?: { href: string; label: string } };
 export type FaqGroup = { id: string; title: string; en: string; items: Faq[] };
 
@@ -21,7 +26,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "beginner",
         q: "ミシン初心者でも利用できますか？",
-        a: "はい、ご利用いただけます。Nippori Share Base は、初心者の方も経験者の方も、それぞれのペースでものづくりを楽しめる場所を目指しています。初めて使う機種は、スタッフの説明または案内を確認してからお使いください。使い方のサポートをどこまで受けられるかは、ご予約時にお問い合わせください。",
+        a: "はい、ご利用いただけます。Nippori Share Base は、初心者の方も経験者の方も、それぞれのペースでものづくりを楽しめる場所を目指しています。初めて使う機種は、スタッフの説明または案内を確認してからお使いください。ご希望の方向けに「メンターサポート」という制度もあります。内容と料金は、ご予約時にお問い合わせください。",
         link: { href: "/first-time", label: "初めての方へ" },
       },
       {
@@ -61,7 +66,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
         id: "how-to-reserve",
         q: "予約は必要ですか？",
         a: "基本的に事前予約制です。Google カレンダーで空き状況をご確認のうえ、予約申込フォームからお申し込みください。空きがある場合は当日利用も可能です。カレンダーに表示のない日・時間帯はご予約いただけません。",
-        link: { href: "/reserve", label: "空き状況と予約フォーム" },
+        link: { href: "/reserve", label: "空き状況を見て予約する" },
       },
       {
         id: "slots",
@@ -71,7 +76,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "price",
         q: "料金はいくらですか？",
-        a: "ミシン利用は一般価格で Team AM・Team PM が各2,000円、All Day が4,000円です（税抜・1人あたり）。当日空きがある場合のみ、1時間1,000円の利用もご案内しています。ミシンを使わない休憩利用・裁断台利用・ハンドメイド利用・貸切利用の料金は料金ページをご覧ください。",
+        a: `ミシン利用は一般価格で Team AM・Team PM が各 ${priceText(general[0])}、All Day が ${priceText(general[2])} です（1人あたり）。当日空きがある場合のみ、1時間 ${priceText(MACHINE_PLANS.hourly.ex)} の利用もご案内しています。ミシンを使わない休憩利用・裁断台利用・ハンドメイド利用・貸切利用の料金は料金ページをご覧ください。`,
         link: { href: "/price", label: "料金表を見る" },
       },
       {
@@ -93,7 +98,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "member",
         q: "会員制度はありますか？",
-        a: "月額会員「Chum's Sewing Club」があります。月額700円（税別）または年払い8,000円（税別）で、ミシン利用が会員価格になるほか、齊藤商店での対象商品10％OFFなどの特典があります。お申込みは店頭で承ります。",
+        a: `月額会員「Chum's Sewing Club」があります。月額 ${priceText(CLUB.monthlyEx)}、または年払い ${priceText(CLUB.yearlyEx)} で、ミシン利用が会員価格になるほか、齊藤商店での対象商品10％OFFなどの特典があります。お申込みは店頭で承ります。`,
         link: { href: "/chums-sewing-club", label: "Chum's Sewing Club について" },
       },
     ],
@@ -133,7 +138,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "cutting-only",
         q: "裁断だけ、休憩だけの利用もできますか？",
-        a: "はい。裁断台と裁ち鋏が使える「裁断台利用」（15分300円・税抜）、お買い物の合間に椅子で休める「休憩利用」（1時間500円・税抜・ワンドリンク制）があります。どちらも当日受付で、店頭でお申し付けください。",
+        a: `はい。裁断台と裁ち鋏が使える「裁断台利用」（${planPriceText("cutting")}）、お買い物の合間に椅子で休める「休憩利用」（${planPriceText("break")}・ワンドリンク制）があります。どちらも当日受付で、店頭でお申し付けください。`,
       },
     ],
   },
@@ -156,7 +161,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "private-price",
         q: "貸切の料金と利用時間を教えてください。",
-        a: "貸切利用は基本料金20,000円（税抜）からで、内容に応じてご相談のうえ決まります。基本の利用時間は原則として1日単位（9:00〜17:30）で、準備・設営・撤収・原状回復の時間を含みます。日曜・祝日のご利用もご相談いただけます。",
+        a: `貸切利用は基本料金 ${planPriceText("private")} で、内容に応じてご相談のうえ決まります。基本の利用時間は原則として1日単位（9:00〜17:30）で、準備・設営・撤収・原状回復の時間を含みます。日曜・祝日のご利用もご相談いただけます。`,
       },
       {
         id: "event-food",

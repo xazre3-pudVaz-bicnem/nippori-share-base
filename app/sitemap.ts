@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { getActiveCategories, getAllColumns } from "@/lib/columns";
+import { getActiveCategories, getAllColumns, isCategoryIndexable } from "@/lib/columns";
 import { STATIC_ROUTES } from "@/lib/nav";
 import { IS_PUBLIC, absoluteUrl } from "@/lib/seo";
 import { PRICE_AS_OF } from "@/data/pricing";
@@ -18,7 +18,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: r.priority,
   }));
 
-  const categoryPages: MetadataRoute.Sitemap = getActiveCategories().map((c) => ({
+  // noindex にしているカテゴリ一覧（記事が少ないもの）は載せない
+  const categoryPages: MetadataRoute.Sitemap = getActiveCategories().filter(isCategoryIndexable).map((c) => ({
     url: absoluteUrl(`/column/category/${c}`)!,
     lastModified: latest,
     changeFrequency: "weekly",

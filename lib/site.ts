@@ -40,6 +40,21 @@ export const SITE = {
   /** Google マップ（住所検索。API キー不要の埋め込み） */
   mapEmbedUrl: "https://www.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%8D%92%E5%B7%9D%E5%8C%BA%E6%9D%B1%E6%97%A5%E6%9A%AE%E9%87%8C4-33-3&hl=ja&z=17&output=embed",
   mapLinkUrl: "https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E9%83%BD%E8%8D%92%E5%B7%9D%E5%8C%BA%E6%9D%B1%E6%97%A5%E6%9A%AE%E9%87%8C4-33-3+%E9%BD%8A%E8%97%A4%E5%95%86%E5%BA%97",
+  /**
+   * 本格稼働した日。出典：荒川102 の記事（2026-09-24 掲載）
+   * 「2026年の年明けから企画はスタート。今年の夏から内容を固め、9/1より本格稼働」
+   */
+  openedOn: "2026-09-01",
+  /** メディア掲載。実際に掲載されたものだけを足す（記事の本文は転載しない。リンクだけ） */
+  media: [
+    {
+      outlet: "荒川102",
+      outletNote: "荒川区の地域情報サイト",
+      title: "ものづくりのハードルを下げたい！日暮里繊維街に誕生したNippori Share Base",
+      url: "https://arakawa102.com/business/nippori-share-base/",
+      date: "2026-09-24",
+    },
+  ],
   /** 予約枠（利用規約 第7条・料金表より） */
   slots: [
     { name: "Team AM", time: "10:00〜13:30" },
@@ -51,5 +66,17 @@ export const SITE = {
 export const telHref = `tel:${SITE.tel.replace(/-/g, "")}`;
 export const mailHref = `mailto:${SITE.email}`;
 
-/** 内部リンクの「予約する」の行き先（空き状況カレンダー＋申込フォームのページ） */
+/** 一般のご利用（ミシン・ハンドメイド）の予約。空き状況カレンダー＋申込フォームのページ */
 export const RESERVE_PATH = "/reserve";
+/** 貸切・イベント利用の相談。予約ページの中の「貸切のご相談」の位置 */
+export const PRIVATE_PATH = "/reserve#private";
+/** 貸切の相談メール（件名を入れた状態でメールソフトが開く） */
+export const privateMailHref = `mailto:${SITE.email}?subject=${encodeURIComponent("貸切利用の相談")}`;
+
+/** 予約導線の文言。ページによって言い方がばらつかないよう、ここから使う */
+export const CTA_LABEL = {
+  general: "空き状況を見て予約する",
+  generalShort: "空き状況・予約",
+  private: "貸切利用を相談する",
+  privateShort: "貸切の相談",
+} as const;

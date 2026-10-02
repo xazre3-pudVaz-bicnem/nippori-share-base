@@ -2,9 +2,10 @@ import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
 
 /**
- * 本番 URL は NEXT_PUBLIC_SITE_URL だけから決める。
- * 未設定なら canonical / OG の URL / sitemap を一切出さず、robots は noindex にする。
- * NODE_ENV は見ない（Vercel のプレビューも production ビルドのため）。
+ * 本番 URL は NEXT_PUBLIC_SITE_URL の 1 つだけ。値は next.config.ts が決めて渡している
+ * （環境変数に指定があればそれ、無ければ Vercel の本番デプロイのときだけ本番ドメイン、それ以外は空）。
+ * 空のときは canonical / OG の URL / sitemap を一切出さず、robots は noindex にする。
+ * ページやコンポーネントに URL を直接書かず、必ず absoluteUrl() を通すこと。
  *
  * このファイルはクライアントコンポーネントから読み込まれても動くよう、
  * fs などサーバー専用のモジュールを import しないこと。
@@ -15,7 +16,7 @@ export const IS_PUBLIC = Boolean(SITE_URL);
 
 if (!IS_PUBLIC && process.env.NODE_ENV === "production" && typeof window === "undefined") {
   console.warn(
-    "[Nippori Share Base] NEXT_PUBLIC_SITE_URL が未設定です。canonical/OG/sitemap は出力されず、全ページ noindex になります。",
+    "[Nippori Share Base] 本番 URL が決まっていません（ローカル・プレビューでは正常）。canonical/OG/sitemap は出力されず、全ページ noindex になります。",
   );
 }
 

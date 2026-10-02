@@ -1,0 +1,27 @@
+import type { ReactNode } from "react";
+
+type Props = {
+  /** 英字の小見出し（現在の公式サイトの「What about」に合わせた書体） */
+  en?: string;
+  title: ReactNode;
+  lead?: ReactNode;
+  align?: "center" | "left";
+  as?: "h2" | "h3";
+  id?: string;
+  className?: string;
+};
+
+/** セクション見出し。英字ラベル → 日本語の丸ゴシック見出し → 並縫いの線 */
+export function SectionHeading({ en, title, lead, align = "center", as: Tag = "h2", id, className = "" }: Props) {
+  const center = align === "center";
+  return (
+    <div className={`${center ? "text-center" : ""} ${className}`}>
+      {en ? <p className="eyebrow text-sm text-ash sm:text-base">{en}</p> : null}
+      <Tag id={id} className="mt-1 text-[1.65rem] sm:text-4xl">
+        {title}
+      </Tag>
+      <div className={`stitch mt-4 w-28 text-ink ${center ? "mx-auto" : ""}`} aria-hidden />
+      {lead ? <p className={`mt-6 text-[0.95rem] sm:text-base ${center ? "mx-auto max-w-2xl" : "max-w-2xl"}`}>{lead}</p> : null}
+    </div>
+  );
+}

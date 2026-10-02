@@ -1,0 +1,327 @@
+@import "tailwindcss";
+
+/*
+ * 欧文フォント（1ファイルずつ。scripts/fetch-fonts.mjs で取得）
+ * - Train One … ロゴタイトル「Nippori Share Base」用。現在の公式サイトと同じ書体
+ * - M PLUS 1 Code … 英字の小見出し用
+ * 日本語の見出し用「Zen Maru Gothic」は app/layout.tsx から PC 幅のときだけ後読みする。
+ */
+@font-face {
+  font-family: "Train One";
+  src: url("/fonts/train-one-basic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  /* 収録しているのは英数字と「 .,'’!?&-」だけ（scripts/fetch-fonts.mjs）。それ以外の文字は次の書体で表示される */
+  unicode-range: U+0020-0021, U+0026-0027, U+002C-002E, U+0030-0039, U+003F, U+0041-005A, U+0061-007A, U+2019;
+}
+@font-face {
+  font-family: "M PLUS 1 Code";
+  src: url("/fonts/m-plus-1-code-latin.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0020-007E, U+00A0, U+2019;
+}
+
+@theme {
+  /* ブランドカラー：現在の公式サイトの配色をそのまま引き継ぐ */
+  --color-sun: #fee65c;
+  --color-sun-deep: #ffd230;
+  --color-cream: #fff5bd;
+  --color-butter: #fffbe6;
+  --color-ink: #231f20;
+  --color-slate: #304254;
+  --color-ash: #56524c;
+  --color-line: #eadf9f;
+  /* ミシンの種類ラベル（Instagram の機種紹介画像の色） */
+  --color-cat-home: #f9b4b4;
+  --color-cat-pro: #ffe45e;
+  --color-cat-lock: #abee74;
+  --color-cat-cover: #7adbf0;
+  --color-cat-limited: #ffad5c;
+
+  --font-sans: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic Medium", "Yu Gothic", "Noto Sans JP",
+    "Noto Sans CJK JP", Meiryo, system-ui, sans-serif;
+  --font-round: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic Medium", "Yu Gothic",
+    "Noto Sans JP", Meiryo, sans-serif;
+  --font-display: "Train One", "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", sans-serif;
+  --font-code: "M PLUS 1 Code", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --breakpoint-xs: 26rem;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: #fff;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.9;
+    letter-spacing: 0.02em;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "palt" 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-round);
+    font-weight: 700;
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    /* 日本語の見出しを文節の途中で折り返さない（対応ブラウザのみ） */
+    word-break: auto-phrase;
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-slate);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-sun);
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* カスタムクラスは必ず components レイヤーに入れる（素で書くとユーティリティを打ち消す） */
+@layer components {
+  /* ── ボタン：現在の公式サイトと同じピル型 ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    min-height: 3rem;
+    padding: 0.6rem 1.75rem;
+    border-radius: 9999px;
+    font-family: var(--font-round);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1.4;
+    text-align: center;
+    transition:
+      transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 0.25s,
+      box-shadow 0.25s;
+  }
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+  .btn:active {
+    transform: translateY(0);
+  }
+  .btn-ink {
+    background: var(--color-ink);
+    color: #fff;
+  }
+  .btn-ink:hover {
+    background: #3a3536;
+  }
+  .btn-sun {
+    background: var(--color-sun-deep);
+    color: var(--color-ink);
+  }
+  .btn-sun:hover {
+    background: #ffc800;
+  }
+  .btn-cream {
+    background: var(--color-cream);
+    color: var(--color-ink);
+  }
+  .btn-cream:hover {
+    background: #fff;
+  }
+  .btn-line {
+    background: #fff;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 2px var(--color-ink);
+  }
+  .btn-line:hover {
+    background: var(--color-cream);
+  }
+
+  /* 文章中のリンク：黄色の太い下線（色だけに頼らない） */
+  .link {
+    /* 上下の余白はタップしやすさのため（行の高さは変わらない） */
+    padding-block: 0.3em;
+    text-decoration: underline;
+    text-decoration-color: var(--color-sun-deep);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+    font-weight: 600;
+    transition: text-decoration-color 0.2s;
+  }
+  .link:hover {
+    text-decoration-color: var(--color-ink);
+  }
+
+  /* 並縫いの線：現在の公式サイトの破線見出しを、縫い目に見立てて使う */
+  .stitch {
+    height: 3px;
+    background-image: repeating-linear-gradient(90deg, currentColor 0 22px, transparent 22px 40px);
+    border-radius: 2px;
+  }
+  .stitch-box {
+    border: 2px dashed currentColor;
+  }
+
+  /* 花形の写真マスク（現在の公式サイトの「使えるミシン」と同じ形） */
+  .scallop {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40'/%3E%3Ccircle cx='87.5' cy='50.0' r='12.4'/%3E%3Ccircle cx='82.5' cy='68.8' r='12.4'/%3E%3Ccircle cx='68.8' cy='82.5' r='12.4'/%3E%3Ccircle cx='50.0' cy='87.5' r='12.4'/%3E%3Ccircle cx='31.3' cy='82.5' r='12.4'/%3E%3Ccircle cx='17.5' cy='68.8' r='12.4'/%3E%3Ccircle cx='12.5' cy='50.0' r='12.4'/%3E%3Ccircle cx='17.5' cy='31.2' r='12.4'/%3E%3Ccircle cx='31.2' cy='17.5' r='12.4'/%3E%3Ccircle cx='50.0' cy='12.5' r='12.4'/%3E%3Ccircle cx='68.8' cy='17.5' r='12.4'/%3E%3Ccircle cx='82.5' cy='31.2' r='12.4'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40'/%3E%3Ccircle cx='87.5' cy='50.0' r='12.4'/%3E%3Ccircle cx='82.5' cy='68.8' r='12.4'/%3E%3Ccircle cx='68.8' cy='82.5' r='12.4'/%3E%3Ccircle cx='50.0' cy='87.5' r='12.4'/%3E%3Ccircle cx='31.3' cy='82.5' r='12.4'/%3E%3Ccircle cx='17.5' cy='68.8' r='12.4'/%3E%3Ccircle cx='12.5' cy='50.0' r='12.4'/%3E%3Ccircle cx='17.5' cy='31.2' r='12.4'/%3E%3Ccircle cx='31.2' cy='17.5' r='12.4'/%3E%3Ccircle cx='50.0' cy='12.5' r='12.4'/%3E%3Ccircle cx='68.8' cy='17.5' r='12.4'/%3E%3Ccircle cx='82.5' cy='31.2' r='12.4'/%3E%3C/svg%3E");
+    -webkit-mask-size: 100% 100%;
+    mask-size: 100% 100%;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+  }
+
+  /* ロゴタイトル（Train One はラテン文字のみ。日本語には当てない） */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+  }
+  /* 英字の小見出し */
+  .eyebrow {
+    font-family: var(--font-code);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+  }
+
+  /* スクロールで現れる演出。JS が「画面より下にある要素」にだけ reveal-wait を付ける。
+     JS が動かなくても本文は最初から見えている。 */
+  .reveal-wait {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* コラム本文（Markdown） */
+  .prose-nsb {
+    font-size: 1rem;
+    line-height: 2;
+  }
+  .prose-nsb > * + * {
+    margin-top: 1.4em;
+  }
+  .prose-nsb h2 {
+    margin-top: 3em;
+    padding-bottom: 0.5em;
+    font-size: 1.4rem;
+    background-image: repeating-linear-gradient(90deg, var(--color-sun-deep) 0 18px, transparent 18px 30px);
+    background-size: 100% 4px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+  }
+  .prose-nsb h3 {
+    margin-top: 2.2em;
+    padding-left: 0.8em;
+    font-size: 1.15rem;
+    border-left: 6px solid var(--color-sun-deep);
+  }
+  .prose-nsb ul,
+  .prose-nsb ol {
+    padding-left: 1.4em;
+  }
+  .prose-nsb ul {
+    list-style: disc;
+  }
+  .prose-nsb ol {
+    list-style: decimal;
+  }
+  .prose-nsb li + li {
+    margin-top: 0.4em;
+  }
+  .prose-nsb li::marker {
+    color: var(--color-ash);
+  }
+  .prose-nsb strong {
+    font-weight: 700;
+    background: linear-gradient(transparent 62%, var(--color-sun) 62%);
+  }
+  .prose-nsb a {
+    padding-block: 0.3em;
+    text-decoration: underline;
+    text-decoration-color: var(--color-sun-deep);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+    font-weight: 600;
+  }
+  .prose-nsb a:hover {
+    text-decoration-color: var(--color-ink);
+  }
+  .prose-nsb blockquote {
+    padding: 1em 1.2em;
+    background: var(--color-butter);
+    border-left: 6px solid var(--color-sun);
+    border-radius: 0 12px 12px 0;
+  }
+  .prose-nsb table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.94rem;
+    line-height: 1.7;
+  }
+  .prose-nsb th,
+  .prose-nsb td {
+    padding: 0.7em 0.8em;
+    border: 1px solid var(--color-line);
+    text-align: left;
+    vertical-align: top;
+  }
+  .prose-nsb th {
+    background: var(--color-cream);
+    font-weight: 700;
+  }
+  .prose-nsb .table-wrap {
+    overflow-x: auto;
+  }
+
+  /* 画面外の区画の描画を後回しにする（長いページのスマホ表示対策） */
+  .cv {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 720px;
+  }
+}
+
+@media (min-width: 64rem) {
+  html {
+    scroll-padding-top: 6rem;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}

@@ -64,7 +64,7 @@ NAP 表記は「Nippori Share Base／〒116-0014 東京都荒川区東日暮里4
 - 料金は「税込 2,200円」＋下に税抜（`Price` / `PriceInc`）。英字の街の名前は「Nippori Fabric Town」
 - 同じ写真を何ページにも使い回さない（ページごとに、目的に合う写真を選ぶ）
 - 本番 URL が無いビルド（プレビュー・ローカル）は全ページ noindex。NODE_ENV で本番判定しない
-- アクセス解析（GA4）は `NEXT_PUBLIC_GA_ID` があり、かつ本番公開のビルドのときだけ読み込む（`components/layout/Analytics.tsx`）
+- アクセス解析（GA4）は、本番のビルドを本番のドメインで開いたときだけ読み込む（`components/layout/Analytics.tsx`。測定 ID もここ）
 - 日本語の Web フォントはスマホで読み込まない（`app/layout.tsx`）。Train One は英数字だけ収録しているので日本語に当てない
 - globals.css のカスタムクラスは `@layer components` の中に書く
 - `[data-reveal]` の表示演出は IntersectionObserver だけで判定する。`getBoundingClientRect` を全要素に呼ぶと

@@ -33,17 +33,18 @@
 | 名前 | 必須 | 内容 |
 | --- | --- | --- |
 | `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` | 任意 | Search Console の所有権確認（HTML タグ方式）の `content` の値。入れると `<meta name="google-site-verification">` が出ます。空ならタグは出ません。設定後は再デプロイ |
-| `NEXT_PUBLIC_GA_ID` | 任意 | Google アナリティクス（GA4）の測定 ID（`G-XXXXXXXXXX`）。Production 環境にだけ設定します。入れると本番でだけ計測タグが読み込まれます（プレビュー・ローカルでは読み込みません）。設定後は再デプロイ |
+| `NEXT_PUBLIC_GA_ID` | 不要 | Google アナリティクス（GA4）の測定 ID を、別のプロパティに切り替えたいときだけ。通常は `components/layout/Analytics.tsx` に書いてある ID が使われます |
 | `NEXT_PUBLIC_SITE_URL` | 不要 | 本番 URL を一時的に上書きしたいときだけ。Production 環境にのみ設定 |
 
-### アクセス解析（GA4）を入れる
+### アクセス解析（GA4）
 
-1. Google アナリティクスで GA4 のプロパティを作り、ウェブのデータストリームに `https://www.nipporisharebase.com` を登録する
-2. 表示された測定 ID（`G-` で始まる）を、Vercel の Environment Variables に `NEXT_PUBLIC_GA_ID` として **Production にだけ**設定する
-3. 再デプロイする（環境変数はビルド時に読み込まれるため）。GA4 の「リアルタイム」に自分のアクセスが出れば完了
+Google アナリティクス（GA4）で計測しています。測定 ID は `G-TL2CLDZ3ZB`（`components/layout/Analytics.tsx` の `GA_MEASUREMENT_ID`）。
+**計測を始めたのは 2026-10-07 です。**それより前のアクセスは GA4 には残っていません。
 
-計測は設定した日からしか始まりません。ページの移動と、予約フォーム（Google フォーム）へのクリックは、GA4 の拡張計測機能が自動で記録します
-（`components/layout/Analytics.tsx`）。
+- 読み込むのは、本番のビルドを本番のドメイン（`www.nipporisharebase.com`）で開いたときだけ。プレビュー・ローカル・`*.vercel.app` では読み込みません
+- ページの移動と、予約フォーム（Google フォーム）へのクリックは、GA4 の拡張計測機能が自動で記録します
+- 動いているかは、GA4 の「レポート → リアルタイム」で確かめられます
+- ほかの人にデータを見せるときは、GA4 の「管理 → アクセス管理」で、その人の Google アカウントを「閲覧者」として追加します
 
 ### 公開後にやると効果が大きいこと
 

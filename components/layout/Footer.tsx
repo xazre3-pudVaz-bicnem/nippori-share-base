@@ -51,7 +51,7 @@ export function Footer() {
               href={SITE.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-ink px-5 font-round text-sm font-bold"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-ink px-5 font-round text-sm font-bold transition-colors duration-200 hover:bg-ink hover:text-white"
             >
               <InstagramIcon />
               Instagram {SITE.instagramHandle}

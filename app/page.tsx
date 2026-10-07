@@ -3,8 +3,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
-import { MACHINE_PLANS, planById } from "@/data/pricing";
+import { MACHINE_PLANS, MENTOR, planById, priceText } from "@/data/pricing";
 import { getAllColumns } from "@/lib/columns";
+import { Budou, BudouLines } from "@/lib/budou";
 import { buildMetadata, formatDateJa } from "@/lib/seo";
 import { CTA_LABEL, RESERVE_PATH, SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -27,7 +28,7 @@ export const metadata: Metadata = buildMetadata({
   rawTitle: true,
   description: SITE.description,
   path: "/",
-  keywords: ["日暮里 レンタルスペース", "日暮里 ものづくり", "日暮里 シェアスペース", "東日暮里 レンタルスペース"],
+  keywords: ["日暮里 レンタルスペース", "日暮里 ものづくり", "日暮里 シェアスペース", "日暮里繊維街 レンタルスペース"],
 });
 
 /** できること（旧サイトの文章をそのまま使用） */
@@ -52,22 +53,28 @@ const CAN_DO = [
   },
 ];
 
-/** こんな場所です（旧サイトの文章をそのまま使用） */
+/**
+ * こんな場所です（文章は旧サイトのもの）。写真は 3 枚とも、実際の Nippori Share Base で撮ったもの。
+ * レーザー加工はオーダー制（ご自身で操作する体験ではない）なので、2 つ目の文章だけ言い回しを合わせている。
+ */
 const SCENES = [
   {
-    img: IMG.sceneSewing,
+    img: IMG.scenePattern,
+    position: "50% 30%",
     title: "みんなでミシン",
     sub: "洋裁仲間との交流や情報交換",
     body: "普段おうちで一人でやっているミシンも、いつもと違う場所で、誰かとやったら新たなときめきや、思わぬ発見があるかも。",
   },
   {
-    img: IMG.sceneKnitting,
+    img: IMG.workPincushions,
+    position: "50% 45%",
     title: "ハンドメイドを楽しく",
     sub: "ミシンだけじゃない",
-    body: "みんなで集まって編み会をしたり。レーザー加工機を使って、オリジナルグッズを作ったり。ハンドメイドの無限の可能性をみんなで楽しみましょう。",
+    body: "みんなで集まって編み会をしたり。レーザー加工で、オリジナルグッズを作ったり。ハンドメイドの無限の可能性をみんなで楽しみましょう。",
   },
   {
-    img: IMG.sceneLaser,
+    img: IMG.layoutSeminarBack,
+    position: "50% 50%",
     title: "楽しさをシェア",
     sub: "ワークショップやイベント開催",
     body: "ハンドメイドが楽しくなってきたら今度はシェアする楽しみを。ワークショップやイベント開催でハンドメイドの楽しさをシェアしましょう。",
@@ -159,38 +166,32 @@ export default function HomePage() {
               <span className="eyebrow block text-[2rem] sm:text-5xl">What about</span>
               <span className="display mt-1 block text-[2rem] sm:text-5xl">Nippori Share Base</span>
             </h2>
-            <div className="mt-8 space-y-6 text-[0.95rem] leading-[1.75] sm:text-[1.05rem]">
+            {/* 旧サイトと同じ行分け。画面が狭くて 1 行に収まらないときも、文節の途中では折り返さない（lib/budou.tsx） */}
+            <div className="mt-8 space-y-6 text-balance text-[0.95rem] leading-[1.75] sm:text-[1.05rem]">
               <p>
-                ものづくりの街・日暮里から
-                <br />
-                <strong>「やってみたい」</strong>をカタチに。
+                <span className="block">ものづくりの街・日暮里から</span>
+                <span className="block">
+                  <strong>「やってみたい」</strong>をカタチに。
+                </span>
               </p>
               <p>
-                Nippori Share Baseは、
-                <br />
-                日暮里繊維街・齊藤商店の2階にある、
-                <br />
-                ものづくりのためのシェアスペースです。
+                <BudouLines lines={["Nippori Share Baseは、", "日暮里繊維街・齊藤商店の2階にある、", "ものづくりのためのシェアスペースです。"]} />
               </p>
               <p>
-                ミシンを使った作品づくりから、
-                <br />
-                ワークショップやイベント、展示会まで。
+                <BudouLines lines={["ミシンを使った作品づくりから、", "ワークショップやイベント、展示会まで。"]} />
               </p>
               <p>
-                洋裁やものづくりへのハードルを少しでも下げ、
-                <br />
-                「やってみたい！」を気軽にカタチにできる
+                <BudouLines lines={["洋裁やものづくりへのハードルを少しでも下げ、", "「やってみたい！」を気軽にカタチにできる"]} />
               </p>
               <p>
-                人とつながり、道具と出会い、
-                <br />
-                「やってみたい」が生まれる
+                <BudouLines lines={["人とつながり、道具と出会い、", "「やってみたい」が生まれる"]} />
               </p>
               <p>
-                <strong>ヒト・モノ・コト</strong>が巡る場所であることが
-                <br />
-                Nippori Share Baseの目指す空間です
+                <span className="block">
+                  <strong>ヒト・モノ・コト</strong>
+                  <Budou>が巡る場所であることが</Budou>
+                </span>
+                <BudouLines lines={["Nippori Share Baseの目指す空間です"]} />
               </p>
             </div>
             <p className="mt-9">
@@ -270,9 +271,9 @@ export default function HomePage() {
         <Container>
           <SectionHeading en="Scenes" title="こんな場所です" />
           <ul className="mt-12 grid gap-14 sm:mt-16 md:grid-cols-3 md:gap-8 lg:gap-12">
-            {SCENES.map((p, i) => (
-              <li key={p.title} className={`text-center ${i === 1 ? "md:mt-12" : ""}`} data-reveal>
-                <Photo img={p.img} ratio="aspect-[4/5]" sizes="(max-width: 767px) 88vw, 360px" className="rounded-2xl" />
+            {SCENES.map((p) => (
+              <li key={p.title} className="text-center" data-reveal>
+                <Photo img={p.img} ratio="aspect-[4/5]" position={p.position} sizes="(max-width: 767px) 88vw, 360px" className="rounded-2xl" />
                 <h3 className="mt-6 text-xl tracking-[0.1em] sm:text-2xl">{p.title}</h3>
                 <p className="text-sm underline decoration-ink/60 underline-offset-4">{p.sub}</p>
                 <p className="mx-auto mt-4 max-w-[20rem] text-[0.92rem] leading-[1.8]">{p.body}</p>
@@ -284,12 +285,12 @@ export default function HomePage() {
             <h3 className="text-center text-xl sm:text-2xl">目的から、ページを選ぶ</h3>
             <ul className="rows mt-7">
               {WAYS.map((w) => (
-                <li key={w.href} data-reveal>
+                <li key={w.href} className="first:[&>a]:pt-0" data-reveal>
                   <Link href={w.href} className="group flex items-center justify-between gap-4 py-5">
                     <span className="text-[0.95rem] sm:text-base">{w.want}</span>
                     <span className="flex shrink-0 items-center gap-3 font-round text-sm font-bold sm:text-base">
                       <span className="hidden sm:inline">{w.to}</span>
-                      <span aria-hidden className="grid size-9 place-items-center rounded-full bg-sun transition-transform duration-300 group-hover:translate-x-1">
+                      <span aria-hidden className="grid size-9 place-items-center rounded-full bg-sun transition-[transform,background-color,color] duration-300 group-hover:translate-x-1 group-hover:bg-ink group-hover:text-white">
                         <ArrowIcon />
                       </span>
                     </span>
@@ -308,7 +309,7 @@ export default function HomePage() {
             <Photo img={IMG.exterior} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 480px" position="50% 70%" />
           </div>
           <div data-reveal>
-            <p className="eyebrow text-sm text-ash sm:text-base">Nippori Textile Town</p>
+            <p className="eyebrow text-sm text-ash sm:text-base">Nippori Fabric Town</p>
             <h2 className="mt-1 text-[1.65rem] sm:text-4xl">
               生地・材料を買った、
               <br />
@@ -376,7 +377,7 @@ export default function HomePage() {
       <section className="pinked bg-sun py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading en="Price" title="料金のめやす" lead="ミシンを使う場合は、半日または1日の枠でのご利用です（1人あたり）。" />
-          <dl className="rows mt-10" data-reveal>
+          <dl className="rows rows-top mt-10" data-reveal>
             <div className="flex items-center justify-between gap-4 py-5">
               <dt>
                 <span className="font-round text-lg font-bold">ミシン利用（半日）</span>
@@ -423,7 +424,9 @@ export default function HomePage() {
               <p>
                 洋裁教室ではないので、決まった課題はありません。作りたいものと材料を持って、自分のペースでどうぞ。ミシンが久しぶりの方も、初めての方も歓迎しています。
               </p>
-              <p>初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。ご希望の方向けに、メンターサポートという制度もあります。</p>
+              <p>
+                初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。一人で作るのが不安な方には、スタッフが製作をサポートする「{MENTOR.name}」（1時間 {priceText(MENTOR.exPerHour)}）もあります。
+              </p>
             </div>
             <p className="mt-8">
               <Link href="/first-time" className="btn btn-sun">

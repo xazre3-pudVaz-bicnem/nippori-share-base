@@ -22,7 +22,7 @@ export function ColumnBody({ markdown }: { markdown: string }) {
           // 記事タイトルが h1。本文に h1 が紛れても h2 に落とす
           h1: ({ children }) => <h2>{children}</h2>,
           h2: ({ children }) => (
-            <h2 id={`sec-${++h2Count}`} className="scroll-mt-28">
+            <h2 id={`sec-${++h2Count}`} className="scroll-mt-6">
               {children}
             </h2>
           ),

@@ -3,9 +3,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { IMG } from "@/data/images";
 import { LIMITED_MACHINES, MACHINE_CATEGORIES } from "@/data/machines";
+import { STAFF } from "@/data/staff";
 import { aboutPageSchema } from "@/lib/schema";
 import { buildMetadata, formatDateJa } from "@/lib/seo";
-import { SITE, mailHref, telHref } from "@/lib/site";
+import { RESERVE_PATH, SITE, mailHref, telHref } from "@/lib/site";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon, ExternalIcon, InstagramIcon } from "@/components/ui/Icons";
@@ -16,14 +17,15 @@ import { ReserveCta } from "@/components/sections/ReserveCta";
 
 /**
  * 「誰が、どこで、何のために運営している場所か」を伝えるページ。
- * 書いてよいのは確認できた事実だけ（docs/VERIFIED_FACTS.md）。運営メンバーの名前・経歴・資格は、
- * ご本人から提供されるまで書かない。第三者の記事に基づく内容には、出典を添える。
+ * 書いてよいのは確認できた事実だけ（docs/VERIFIED_FACTS.md）。第三者の記事に基づく内容には、出典を添える。
+ * スタッフ紹介は data/staff.ts（ご本人が Instagram に書いた自己紹介からの抜粋。ニックネームのみ）。
+ * 書かれていない経歴・資格を足したり、言い回しを書き換えたりしないこと。
  */
 export const metadata: Metadata = buildMetadata({
   title: "Nippori Share Base について｜私たちが目指す場所",
   rawTitle: true,
   description:
-    "Nippori Share Base は、日暮里繊維街の生地店・齊藤商店の2階で運営している、ものづくりのためのシェアスペースです。コンセプト「ヒト・モノ・コトが巡る場所」と、できた背景、齊藤商店との関係をご紹介します。",
+    "Nippori Share Base は、日暮里繊維街の生地店・齊藤商店の2階で運営している、ものづくりのためのシェアスペースです。コンセプト「ヒト・モノ・コトが巡る場所」と、できた背景、スタッフ、齊藤商店との関係をご紹介します。",
   path: "/about",
   keywords: ["Nippori Share Base", "Nippori Share Base 運営", "齊藤商店 日暮里", "日暮里繊維街 シェアスペース"],
 });
@@ -82,7 +84,7 @@ export default function AboutPage() {
               Nippori Share Base は洋裁教室ではありません。決まった課題はなく、道具と場所、そして同じように手を動かす人たちがいます。{media.outlet}の取材では、「先生はいないけれど、詳しい先輩はいっぱいいる」という考え方が紹介されています。
             </p>
             <p>
-              同じ記事によると、企画が始まったのは2026年の年明け。夏に内容を固め、{formatDateJa(SITE.openedOn)}に本格的に動きはじめました。それぞれ異なる分野と経験を持つ3人のメンバーで運営しています。
+              同じ記事によると、企画が始まったのは2026年の年明け。夏に内容を固め、{formatDateJa(SITE.openedOn)}に本格的に動きはじめました。それぞれ異なる分野と経験を持つメンバーで運営しています。
             </p>
           </div>
           <p className="mt-6 text-sm">
@@ -94,8 +96,61 @@ export default function AboutPage() {
         </Container>
       </section>
 
+      {/* スタッフ紹介 */}
+      <section id="staff" className="py-20 sm:py-28">
+        <Container>
+          <SectionHeading align="left" en="Staff" title="スタッフ紹介" lead="Nippori Share Base で、みなさんをお迎えするスタッフです。文章は、それぞれが Instagram に書いた自己紹介から抜き出しました。" />
+          <ul className="mt-12 grid gap-x-16 gap-y-14 lg:grid-cols-2">
+            {STAFF.map((s) => (
+              <li key={s.id} id={`staff-${s.id}`} className="scroll-mt-6" data-reveal>
+                <article className="grid gap-x-6 gap-y-5 sm:grid-cols-[10.5rem_1fr]">
+                  <Image src={s.image} alt={s.imageAlt} sizes="(max-width: 639px) 56vw, 168px" quality={65} className="h-auto w-[56%] max-w-[13rem] rounded-2xl sm:w-full" />
+                  <div>
+                    <p className="text-xs leading-5 text-ash">{s.role}</p>
+                    <h3 className="mt-0.5 text-2xl">
+                      {s.name}
+                      {s.kana ? <span className="ml-2 text-sm font-medium tracking-normal">（{s.kana}）</span> : null}
+                    </h3>
+                    <blockquote className="mt-3 space-y-2.5 border-l-4 border-sun pl-4 text-[0.92rem] leading-7">
+                      {s.quotes.map((q) => (
+                        <p key={q}>{q}</p>
+                      ))}
+                    </blockquote>
+                    <dl className="mt-4 space-y-2.5 text-sm leading-7">
+                      {s.facts.map((f) => (
+                        <div key={f.label}>
+                          <dt className="font-round font-bold">{f.label}</dt>
+                          <dd>{f.body}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                  </div>
+                </article>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-12 text-sm leading-7">
+            ＊〈りかDay〉〈チャムDAY〉などの日程は、変わることがあります。
+            <Link href={RESERVE_PATH} className="link">
+              空き状況カレンダー
+            </Link>
+            でご確認ください。
+          </p>
+          <p className="mt-3 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+            <Link href="/first-time#mentor" className="link inline-flex items-center gap-1.5">
+              メンターサポートについて
+              <ArrowIcon />
+            </Link>
+            <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="link inline-flex items-center gap-1.5">
+              <InstagramIcon className="size-4" />
+              自己紹介の全文は Instagram で
+            </a>
+          </p>
+        </Container>
+      </section>
+
       {/* 齊藤商店・日暮里繊維街 */}
-      <section className="py-20 sm:py-28">
+      <section className="bg-butter py-20 sm:py-28">
         <Container className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
           <div data-reveal>
             <Photo img={IMG.exterior} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 480px" position="50% 70%" />
@@ -132,7 +187,7 @@ export default function AboutPage() {
           <div className="measure mt-8 space-y-5 text-[0.95rem] sm:text-base" data-reveal>
             <p>スペースに並ぶミシンのなかには、譲っていただいたものや、お借りしているものがあります。</p>
           </div>
-          <dl className="rows mt-7 text-[0.95rem] [&>*]:border-ink/30">
+          <dl className="rows rows-top mt-7 text-[0.95rem] [&>*]:border-ink/30">
             <div className="grid gap-x-8 gap-y-1 py-5 sm:grid-cols-[11rem_1fr]" data-reveal>
               <dt className="font-round font-bold">寄贈いただいたミシン</dt>
               <dd>{donated.join("、")}</dd>
@@ -160,7 +215,7 @@ export default function AboutPage() {
           <SectionHeading align="left" en="Media" title="メディア掲載" />
           <ul className="rows mt-9">
             {SITE.media.map((m) => (
-              <li key={m.url} className="py-6" data-reveal>
+              <li key={m.url} className="py-6 first:pt-0" data-reveal>
                 <p className="text-sm text-ash">
                   <time dateTime={m.date}>{formatDateJa(m.date)}</time>
                   <span className="mx-2" aria-hidden>
@@ -183,7 +238,7 @@ export default function AboutPage() {
         <Container size="narrow">
           <SectionHeading align="left" en="Information" title="基本情報" />
           <dl className="rows mt-9 text-[0.95rem]">
-            <div className="grid gap-1 py-4 sm:grid-cols-[8rem_1fr]">
+            <div className="grid gap-1 pb-4 sm:grid-cols-[8rem_1fr]">
               <dt className="font-round font-bold">名称</dt>
               <dd>{SITE.name}</dd>
             </div>
@@ -214,6 +269,13 @@ export default function AboutPage() {
                 <a href={mailHref} className="link">
                   {SITE.email}
                 </a>
+              </dd>
+            </div>
+            <div className="grid gap-1 py-4 sm:grid-cols-[8rem_1fr]">
+              <dt className="font-round font-bold">ご利用枠</dt>
+              <dd>
+                {SITE.slots.map((s) => `${s.name} ${s.time}`).join("／")}
+                <span className="block text-sm text-ash">お休みは{SITE.closed}です。</span>
               </dd>
             </div>
             <div className="grid gap-1 py-4 sm:grid-cols-[8rem_1fr]">

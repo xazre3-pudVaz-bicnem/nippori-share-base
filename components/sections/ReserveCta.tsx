@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CTA_LABEL, PRIVATE_PATH, RESERVE_PATH } from "@/lib/site";
+import { budou } from "@/lib/budou";
 import { ArrowIcon } from "@/components/ui/Icons";
 
 type Props = {
@@ -54,8 +55,8 @@ export function ReserveCta({ variant = "general", title, body, links }: Props) {
     <section className="bg-sun" data-cta-zone>
       <div className="mx-auto max-w-4xl px-5 py-16 text-center sm:px-8 sm:py-24">
         <p className="eyebrow text-sm text-ink/80">{variant === "private" ? "Private use" : "Reservation"}</p>
-        <h2 className="mt-2 text-2xl sm:text-3xl">{title ?? d.title}</h2>
-        <p className="measure mx-auto mt-5 text-[0.95rem]">{body ?? d.body}</p>
+        <h2 className="mt-2 text-2xl sm:text-3xl">{budou(title ?? d.title)}</h2>
+        <p className="mx-auto mt-5 max-w-2xl text-[0.95rem]">{budou(body ?? d.body)}</p>
 
         {variant === "both" ? (
           <div className="mx-auto mt-10 grid max-w-3xl gap-8 sm:grid-cols-2 sm:gap-6">

@@ -1,21 +1,38 @@
 import { MACHINE_PLANS, OTHER_PLANS, type OtherPlanId, withTax, yen } from "@/data/pricing";
+import { Budou } from "@/lib/budou";
 
 /**
- * 金額の表示。支払う総額が分かるよう税込を大きく、税抜を小さく添える。
+ * 金額の表示。1 行目に「税込 2,200円」（小さな「税込」のあとに金額）、2 行目に税抜を小さく添える。
  * 金額は data/pricing.ts の税抜の値から計算する（ここに数字を直接書かない）。
+ * 「税込」と金額は別々の inline-block なので、幅がとても狭い表（320px の画面）でだけ 2 行に分かれる。
  */
-export function Price({ ex, from = false, size = "md", stack = false }: { ex: number; from?: boolean; size?: "sm" | "md" | "lg"; /** 幅の狭い表の中で、「税込」を金額の下の行に置く */ stack?: boolean }) {
+export function Price({ ex, from = false, size = "md" }: { ex: number; from?: boolean; size?: "sm" | "md" | "lg" }) {
   const main = size === "lg" ? "text-3xl sm:text-4xl" : size === "sm" ? "text-[0.95rem] sm:text-lg" : "text-xl sm:text-2xl";
   return (
     <span className="inline-block leading-tight">
-      <span className={`font-round font-bold tracking-wide ${main}`}>
+      <span className="mr-[0.2em] inline-block text-[0.62rem] font-bold sm:text-xs">税込</span>
+      <span className={`inline-block font-round font-bold tracking-wide ${main}`}>
         {yen(withTax(ex))}
         <span className="text-[0.6em]">円{from ? "〜" : ""}</span>
       </span>
-      {stack ? <span className="block text-[0.68rem] font-bold leading-4 sm:text-xs">税込</span> : <span className="ml-1 text-[0.7rem] font-medium sm:text-xs">（税込）</span>}
-      <span className="block text-[0.68rem] text-ash sm:text-xs">
+      <span className="mt-0.5 block whitespace-nowrap text-[0.62rem] text-ash min-[360px]:text-[0.68rem] sm:text-xs">
         税抜 {yen(ex)}円{from ? "〜" : ""}
       </span>
+    </span>
+  );
+}
+
+/** 税込で決まっている金額（オプションなど）の表示。Price と同じ並び */
+export function PriceInc({ inc, prefix, suffix }: { inc: number; prefix?: string; suffix?: string }) {
+  return (
+    <span className="inline-block whitespace-nowrap leading-tight">
+      {prefix ? <span className="mr-1.5 text-sm font-bold">{prefix}</span> : null}
+      <span className="mr-[0.2em] text-[0.62rem] font-bold sm:text-xs">税込</span>
+      <span className="font-round text-lg font-bold tracking-wide sm:text-xl">
+        {yen(inc)}
+        <span className="text-[0.6em]">円</span>
+      </span>
+      {suffix ? <span className="ml-1 text-xs font-bold">{suffix}</span> : null}
     </span>
   );
 }
@@ -27,7 +44,7 @@ export function MachinePriceTable() {
       <table className="w-full table-fixed border-collapse text-center text-sm sm:text-base">
         <caption className="sr-only">ミシンを利用する方向けの料金表（1人あたり・税込、税抜を併記）</caption>
         <colgroup>
-          <col className="w-[28%]" />
+          <col className="w-[24%] sm:w-[28%]" />
           <col />
           <col />
           <col />
@@ -46,19 +63,19 @@ export function MachinePriceTable() {
         <tbody>
           {MACHINE_PLANS.rows.map((row) => (
             <tr key={row.id} className="border-t border-ink/15">
-              <th scope="row" className="bg-cream px-1.5 py-4 text-[0.74rem] font-bold leading-5 sm:text-base">
-                {row.label}
+              <th scope="row" className="bg-cream px-1 py-4 text-[0.7rem] font-bold leading-5 min-[360px]:px-1.5 min-[360px]:text-[0.74rem] sm:text-base">
+                <Budou>{row.label}</Budou>
               </th>
               {row.ex.map((ex, i) => (
                 <td key={i} className="border-l border-ink/15 px-0.5 py-3.5">
-                  <Price ex={ex} size="sm" stack />
+                  <Price ex={ex} size="sm" />
                 </td>
               ))}
             </tr>
           ))}
           <tr className="border-t border-ink/15">
-            <th scope="row" className="bg-cream px-1.5 py-4 text-[0.74rem] font-bold leading-5 sm:text-base">
-              {MACHINE_PLANS.hourly.label}
+            <th scope="row" className="bg-cream px-1 py-4 text-[0.7rem] font-bold leading-5 min-[360px]:px-1.5 min-[360px]:text-[0.74rem] sm:text-base">
+              <span className="whitespace-nowrap">{MACHINE_PLANS.hourly.label}</span>
             </th>
             <td colSpan={3} className="border-l border-ink/15 px-3 py-3.5">
               <Price ex={MACHINE_PLANS.hourly.ex} size="sm" />
@@ -75,15 +92,15 @@ export function MachinePriceTable() {
  * ミシン利用以外のプラン。枠で囲んだカードにせず、破線で区切った一覧にする
  * （スマホでは名前 → 料金 → 用途の順に縦に並ぶ）。
  */
-export function PlanList({ only, headingLevel: H = "h3" }: { only?: readonly OtherPlanId[]; headingLevel?: "h3" | "h4" }) {
+export function PlanList({ only, headingLevel: H = "h3", topLine = true }: { only?: readonly OtherPlanId[]; headingLevel?: "h3" | "h4"; /** 見出しのすぐ下に置くときは false（1 件目の上の線を引かない） */ topLine?: boolean }) {
   const plans = only ? OTHER_PLANS.filter((p) => only.includes(p.id)) : OTHER_PLANS;
   return (
-    <ul className="border-t-2 border-dashed border-ink/25">
+    <ul className={topLine ? "border-t-2 border-dashed border-ink/25" : "[&>li:first-child]:pt-0"}>
       {plans.map((p) => (
         <li
           key={p.id}
           id={`plan-${p.id}`}
-          className="grid scroll-mt-28 gap-x-8 gap-y-3 border-b-2 border-dashed border-ink/25 py-7 md:grid-cols-[13rem_12rem_1fr] md:items-start md:py-8"
+          className="grid scroll-mt-4 gap-x-8 gap-y-3 border-b-2 border-dashed border-ink/25 py-7 md:grid-cols-[13rem_13rem_1fr] md:items-start md:py-8"
           data-reveal
         >
           <div>
@@ -102,6 +119,35 @@ export function PlanList({ only, headingLevel: H = "h3" }: { only?: readonly Oth
         </li>
       ))}
     </ul>
+  );
+}
+
+/** キャンセル料の表（通常利用／貸切・イベント利用で共通の見た目） */
+export function CancelTable({ caption, rows }: { caption: string; rows: readonly { when: string; fee: string }[] }) {
+  return (
+    <table className="w-full border-collapse text-[0.95rem]" data-reveal>
+      <caption className="sr-only">{caption}</caption>
+      <thead>
+        <tr className="border-y-2 border-ink/70">
+          <th scope="col" className="py-3 pr-4 text-left font-round font-bold">
+            ご連絡の時期
+          </th>
+          <th scope="col" className="py-3 text-left font-round font-bold">
+            キャンセル料
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((c) => (
+          <tr key={c.when} className="border-b-2 border-dashed border-ink/25">
+            <th scope="row" className="py-4 pr-4 text-left font-medium">
+              {c.when}
+            </th>
+            <td className="py-4">{c.fee}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 

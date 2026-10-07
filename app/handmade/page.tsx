@@ -44,7 +44,7 @@ const CRAFTS = [
   },
   {
     title: "オリジナルグッズづくり",
-    body: "レーザー加工機で木のパーツやタグを切り出したり、カッティングマシーンで文字や図案を切り抜いたり。縫うだけではない、ハンドメイドの幅が広がります。",
+    body: "カッティングマシーンでアイロンシートの文字や図案を切り抜いたり、レーザー加工（オーダー制）で木や革に名前や模様を入れたり。縫うだけではない、ハンドメイドの幅が広がります。",
     href: "/equipment#digital",
     link: "レーザー加工機・カッティングマシーン",
   },
@@ -57,16 +57,10 @@ export default function HandmadePage() {
       <PageHero
         crumbs={[{ name: "洋裁・ハンドメイド", path: "/handmade" }]}
         en="Handmade & Sewing"
-        title={
-          <>
-            日暮里で、洋裁と
-            <br />
-            ハンドメイドを楽しむ制作スペース
-          </>
-        }
+        title="日暮里で、洋裁とハンドメイドを楽しむ制作スペース"
         lead="ミシンだけじゃない。編み物も、手芸も、オリジナルグッズづくりも。一人で黙々と進めたい日にも、誰かと一緒に手を動かしたい日にも使える、ものづくりのアトリエです。"
-        img={IMG.sceneKnitting}
-        position="50% 45%"
+        img={IMG.workScrunchies}
+        position="50% 74%"
       />
 
       {/* 一人で／みんなで */}
@@ -86,16 +80,16 @@ export default function HandmadePage() {
                 家では家事や用事が目に入って、なかなか手が進まない。そんなときは場所を変えるのがいちばんです。自分の作業台に生地と道具を広げたら、あとは目の前の制作に向かうだけ。締め切りのある作品づくりや、イベント出展前の追い込みにも。
               </p>
               <div className="stitch my-9 w-full text-ink/25" aria-hidden />
-              <p id="together" className="eyebrow scroll-mt-28 text-sm text-ash">
+              <p id="together" className="eyebrow scroll-mt-6 text-sm text-ash">
                 Together
               </p>
               <h3 className="mt-1 text-xl sm:text-2xl">仲間と、同じ場所で</h3>
               <p className="measure mt-4 text-[0.95rem] sm:text-base">
-                普段おうちで一人でやっているミシンも、いつもと違う場所で、誰かとやったら新たなときめきや、思わぬ発見があるかも。洋裁仲間との情報交換や、編み会、手芸の集まりに。ハンドメイド利用はグループでお使いいただけます。
+                普段おうちで一人でやっているミシンも、いつもと違う場所で、誰かとやったら新たなときめきや、思わぬ発見があるかも。洋裁仲間との情報交換や、編み会、手芸の集まりに。ハンドメイド利用はグループでお使いいただけます（予約枠1つにつき4名まで）。
               </p>
             </div>
             <div data-reveal>
-              <Photo img={IMG.sceneSewing} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 520px" position="50% 40%" />
+              <Photo img={IMG.spaceLargeTable} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 520px" position="50% 55%" />
             </div>
           </div>
         </Container>
@@ -105,12 +99,12 @@ export default function HandmadePage() {
       <section className="pinked bg-sun py-20 sm:py-28">
         <Container>
           <SectionHeading align="left" en="What to make" title="ここでできる、ものづくり" lead="洋裁・服飾・手芸・クラフトなどの制作活動。利用規約でも、このスペースの主な使い方として掲げています。" />
-          <dl className="rows mt-10 [&>*]:border-ink/30">
+          <dl className="rows rows-top mt-10 [&>*]:border-ink/30">
             {CRAFTS.map((c) => (
               <div key={c.title} className="grid gap-x-10 gap-y-2 py-7 md:grid-cols-[15rem_1fr]" data-reveal>
                 <dt className="font-round text-xl font-bold">{c.title}</dt>
                 <dd className="text-[0.95rem]">
-                  <p className="measure">{c.body}</p>
+                  <p>{c.body}</p>
                   {c.href ? (
                     <Link href={c.href} className="link mt-2 inline-flex items-center gap-1.5 text-sm decoration-ink/40">
                       {c.link}
@@ -128,7 +122,7 @@ export default function HandmadePage() {
       <section className="py-20 sm:py-28">
         <Container className="grid items-center gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:gap-20">
           <div data-reveal>
-            <Photo img={IMG.spaceLargeTable} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 500px" position="50% 55%" />
+            <Photo img={IMG.cuttingPattern} swatch="sun" ratio="aspect-[4/3] lg:aspect-[5/4]" sizes="(max-width: 1023px) 100vw, 500px" position="40% 50%" />
           </div>
           <div data-reveal>
             <SectionHeading align="left" en="Big table" title="大きな机が、制作を変える" />
@@ -174,7 +168,7 @@ export default function HandmadePage() {
       <section className="cv py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading align="left" en="Our manner" title="この場所で大切にしたいこと" lead="利用者同士がお互いを尊重しながら過ごせるよう、次のことへのご協力をお願いしています。" />
-          <ul className="rows mt-9 text-[0.95rem]">
+          <ul className="rows rows-top mt-9 text-[0.95rem]">
             {[
               "設備や道具を大切に扱うこと",
               "初心者・経験者を問わず、お互いを尊重すること",

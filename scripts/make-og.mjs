@@ -34,7 +34,7 @@ const VARIANTS = [
   { key: "default", label: "日暮里のものづくりレンタルスペース", photo: "/images/space/space-main.jpg", pos: "50% 55%" },
   { key: "space", label: "ものづくりに使える、日暮里のレンタルスペース", photo: "/images/space/space-tables.jpg", pos: "50% 60%" },
   { key: "sewing-machine", label: "日暮里で、ミシンを使う。職業用・ロックミシンも", photo: "/images/space/shelf-lock-machines.jpg", pos: "50% 62%" },
-  { key: "handmade", label: "日暮里のハンドメイド・洋裁スペース", photo: "/images/scene/knitting-circle.jpg", pos: "50% 45%" },
+  { key: "handmade", label: "日暮里のハンドメイド・洋裁スペース", photo: "/images/works/scrunchies.jpg", pos: "50% 72%" },
   { key: "workshop", label: "日暮里のワークショップ・イベントスペース", photo: "/images/space/layout-seminar.jpg", pos: "50% 60%" },
   { key: "column", label: "ミシン・洋裁・ハンドメイドのコラム", photo: "/images/space/space-large-table.jpg", pos: "50% 55%" },
 ];

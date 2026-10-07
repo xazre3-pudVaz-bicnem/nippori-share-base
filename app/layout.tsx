@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { preload } from "react-dom";
 import "./globals.css";
+import { Analytics } from "@/components/layout/Analytics";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCta } from "@/components/layout/MobileCta";
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Footer />
         <MobileCta />
         <RevealObserver />
+        <Analytics />
         <JsonLd data={graph(organizationSchema(), localBusinessSchema(), websiteSchema())} />
       </body>
     </html>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MENTOR, priceText } from "@/data/pricing";
 import { buildMetadata } from "@/lib/seo";
 import { CTA_LABEL, SITE, mailHref, privateMailHref, telHref } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -27,7 +28,7 @@ export default function ReservePage() {
       >
         <ul className="mx-auto grid max-w-2xl gap-3 text-left sm:grid-cols-2">
           <li>
-            <a href="#calendar" className="flex h-full items-center justify-between gap-3 rounded-2xl bg-ink px-5 py-4 text-white">
+            <a href="#calendar" className="flex h-full items-center justify-between gap-3 rounded-2xl bg-ink px-5 py-4 text-white transition-[transform,background-color,color,box-shadow] duration-200 hover:-translate-y-0.5 hover:bg-white hover:text-ink hover:shadow-[inset_0_0_0_2px_var(--color-ink)]">
               <span>
                 <span className="block text-xs">ミシン・スペースを自分で使う</span>
                 <span className="font-round text-lg font-bold">{CTA_LABEL.general}</span>
@@ -36,7 +37,7 @@ export default function ReservePage() {
             </a>
           </li>
           <li>
-            <a href="#private" className="flex h-full items-center justify-between gap-3 rounded-2xl bg-cream px-5 py-4">
+            <a href="#private" className="flex h-full items-center justify-between gap-3 rounded-2xl bg-cream px-5 py-4 transition-[transform,background-color,color] duration-200 hover:-translate-y-0.5 hover:bg-ink hover:text-white">
               <span>
                 <span className="block text-xs">ワークショップ・展示会などで貸切する</span>
                 <span className="font-round text-lg font-bold">{CTA_LABEL.private}</span>
@@ -48,7 +49,7 @@ export default function ReservePage() {
       </PageHero>
 
       {/* カレンダー */}
-      <section id="calendar" className="scroll-mt-20 py-20 sm:py-24">
+      <section id="calendar" className="py-20 sm:py-24">
         <Container>
           <SectionHeading align="left" en="Step 1" title="カレンダーで空き状況を見る" lead="基本的に事前予約制です。空きがある場合は、当日のご利用も可能です。" />
           <div className="mt-9 overflow-hidden rounded-2xl border-2 border-ink/80 bg-white">
@@ -73,7 +74,7 @@ export default function ReservePage() {
       </section>
 
       {/* フォーム */}
-      <section id="form" className="scroll-mt-20 bg-butter py-20 sm:py-24">
+      <section id="form" className="bg-butter py-20 sm:py-24">
         <Container size="narrow">
           <SectionHeading align="left" en="Step 2" title="予約申込フォームから申し込む" lead="フォームを送信いただいても、空き状況やお申し込みの状況によりご予約をお受けできないことがございます。" />
           <div className="mt-8">
@@ -90,7 +91,8 @@ export default function ReservePage() {
             items={[
               "利用規約をお読みの上、お申し込みをお願いいたします。予約お申込みにより利用規約に同意したものとみなします。",
               "ご利用される方お一人につき、1件ずつご予約ください。複数名でのご利用も、それぞれが個別にお申し込みください。",
-              "お支払いは、当日の受付時にお願いいたします。",
+              `お支払いは、当日の受付時にお願いいたします（${SITE.payments.join("・")}）。`,
+              `スタッフが製作をサポートする「${MENTOR.name}」（1時間 ${priceText(MENTOR.exPerHour)}）をご希望の方は、フォームでお選びください。原則として平日のみの対応です。`,
               "小さなお子様をお連れの場合は、ご予約時にお知らせください。",
             ]}
           />
@@ -118,14 +120,14 @@ export default function ReservePage() {
       </section>
 
       {/* 貸切のご相談 */}
-      <section id="private" className="pinked scroll-mt-20 bg-sun py-20 sm:py-24">
+      <section id="private" className="pinked bg-sun py-20 sm:py-24">
         <Container size="narrow">
           <SectionHeading align="left" en="Private use" title="貸切・イベント利用のご相談" lead="ワークショップ、講座、展示会、販売会、交流会など。参加費をいただく会や、販売を伴う会は、貸切でのご利用になります。内容や時期が固まっていない段階のご相談で構いません。" />
 
           <h3 className="mt-10 text-lg">お知らせいただきたいこと</h3>
           <ul className="rows mt-4 text-[0.95rem] [&>*]:border-ink/30">
             {["ご希望の日程（候補がいくつかあると助かります）", "開催したい内容と、おおよその人数", "参加費の徴収や、商品の販売があるかどうか", "使いたい設備（ミシン、作業台、ホワイトボードなど）"].map((t) => (
-              <li key={t} className="py-3.5">
+              <li key={t} className="py-3.5 first:pt-0">
                 {t}
               </li>
             ))}

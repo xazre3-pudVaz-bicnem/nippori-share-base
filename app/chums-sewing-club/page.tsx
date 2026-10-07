@@ -94,10 +94,10 @@ export default function ClubPage() {
                     <span className="block text-xs">{s.time}</span>
                   </th>
                   <td className="px-1 py-4">
-                    <Price ex={general.ex[i]} size="sm" stack />
+                    <Price ex={general.ex[i]} size="sm" />
                   </td>
                   <td className="bg-butter px-1 py-4">
-                    <Price ex={member.ex[i]} size="sm" stack />
+                    <Price ex={member.ex[i]} size="sm" />
                   </td>
                 </tr>
               ))}

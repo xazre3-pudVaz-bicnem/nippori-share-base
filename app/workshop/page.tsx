@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
-import { planPriceText } from "@/data/pricing";
+import { EVENT_CANCEL_POLICY, planPriceText } from "@/data/pricing";
 import { buildMetadata } from "@/lib/seo";
 import { CTA_LABEL, PRIVATE_PATH, SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -11,7 +11,7 @@ import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
-import { PlanList } from "@/components/sections/PriceTables";
+import { CancelTable, PlanList } from "@/components/sections/PriceTables";
 import { RelatedLinks } from "@/components/sections/RelatedLinks";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 import { Steps } from "@/components/sections/Steps";
@@ -39,9 +39,9 @@ const EVENT_TYPES = [
   { title: "地域活動・コミュニティ活動", body: "地域の集まりや、個人で運営するコミュニティの活動拠点として。" },
 ];
 
+/** 講座スタイル（椅子を前向きに並べた配置）の写真は、ページのいちばん上で使っている */
 const LAYOUTS = [
-  { img: IMG.layoutSeminar, title: "講座スタイル", body: "椅子を前向きに並べ、正面に作業台を。実演を見せながら進める講座に。" },
-  { img: IMG.layoutSeminarBack, title: "椅子を列に並べる", body: "後方から見た様子。説明会やトークイベントなど、聞く時間が中心の会に。" },
+  { img: IMG.layoutSeminarBack, title: "椅子を列に並べる", body: "講座スタイルを後方から見た様子。説明会やトークイベントなど、聞く時間が中心の会に。" },
   { img: IMG.layoutFloor, title: "床を広く使う", body: "作業台を壁へ寄せ、中央を空けた配置。展示や、大きなものを広げる制作に。" },
 ];
 
@@ -50,7 +50,7 @@ const STEPS = [
   { title: "ご相談・お申し込み", body: "利用希望日、内容、人数、利用目的をお知らせください。販売や参加費の徴収がある場合は、この時点でお伝えください。" },
   { title: "仮予約", body: "内容を確認のうえ、利用枠を一時的に確保します。この時点では、まだ予約は確定していません。" },
   { title: "本予約", body: "予約日の2週間前までに利用料金の50％をお支払いいただき、入金を確認した時点で本予約が確定します。" },
-  { title: "残金のお支払い", body: "残りの50％は、開催日までにお支払いください。お支払いは店舗での現金手渡し、または銀行振込です。" },
+  { title: "残金のお支払い", body: "残りの50％は、開催日までにお支払いください。お支払いは店舗での現金手渡し、または銀行振込です。", link: { href: "/terms/event", label: "振込先はイベント利用規約に記載しています" } },
   { title: "開催当日", body: "設営・準備から撤収・原状回復までを、利用時間内に行ってください。告知や参加者の受付は主催者さまにお願いしています。" },
 ];
 
@@ -69,16 +69,10 @@ export default function WorkshopPage() {
       <PageHero
         crumbs={[{ name: "ワークショップ・イベント", path: "/workshop" }]}
         en="Workshop & Event"
-        title={
-          <>
-            日暮里で、ワークショップや
-            <br />
-            展示会・販売会をひらく
-          </>
-        }
+        title={["日暮里で、ワークショップや", "展示会・販売会をひらく"]}
         lead="ハンドメイドが楽しくなってきたら、今度はシェアする楽しみを。Nippori Share Base は、教えたい人・見せたい人・集まりたい人のための会場としてもお使いいただけます。"
-        img={IMG.sceneLaser}
-        position="50% 50%"
+        img={IMG.layoutSeminar}
+        position="50% 60%"
       >
         <Link href={PRIVATE_PATH} className="btn btn-ink">
           {CTA_LABEL.private}
@@ -108,13 +102,13 @@ export default function WorkshopPage() {
           <SectionHeading align="left" en="What you can hold" title="こんな会をひらけます" />
           <dl className="mt-10 grid gap-x-14 md:grid-cols-2">
             {EVENT_TYPES.map((e) => (
-              <div key={e.title} className="border-t-2 border-dashed border-ink/30 py-6" data-reveal>
+              <div key={e.title} className="border-b-2 border-dashed border-ink/30 py-6 first:pt-0 md:[&:nth-child(2)]:pt-0" data-reveal>
                 <dt className="font-round text-lg font-bold">{e.title}</dt>
                 <dd className="mt-1.5 text-[0.92rem]">{e.body}</dd>
               </div>
             ))}
           </dl>
-          <p className="measure mt-6 text-sm leading-7">
+          <p className="mt-6 text-sm leading-7">
             ＊内容や規模によっては、お受けできない場合があります。上記以外の内容も、当スペースが適切と判断したものはご利用いただけますので、まずはご相談ください。
           </p>
         </Container>
@@ -146,11 +140,11 @@ export default function WorkshopPage() {
       {/* レイアウト */}
       <section className="cv bg-butter py-20 sm:py-28">
         <Container>
-          <SectionHeading align="left" en="Layout" title="イベント時のレイアウト例" lead="作業台はキャスター付きで、動かして配置を変えられます。写真は実際に組んだ配置です。" />
-          <ul className="mt-12 grid gap-x-7 gap-y-12 md:grid-cols-3">
-            {LAYOUTS.map((l, i) => (
-              <li key={l.title} className={i === 1 ? "md:mt-10" : ""} data-reveal>
-                <Photo img={l.img} ratio="aspect-[4/5]" sizes="(max-width: 767px) 100vw, 350px" />
+          <SectionHeading align="left" en="Layout" title="イベント時のレイアウト例" lead="作業台はキャスター付きで、動かして配置を変えられます。ページのいちばん上の写真は、椅子を前向きに並べた講座スタイル。ほかにも、次のように組み替えられます。" />
+          <ul className="mt-12 grid gap-x-9 gap-y-12 md:grid-cols-2">
+            {LAYOUTS.map((l) => (
+              <li key={l.title} data-reveal>
+                <Photo img={l.img} ratio="aspect-[4/3]" sizes="(max-width: 767px) 100vw, 540px" />
                 <h3 className="mt-5 text-lg">{l.title}</h3>
                 <p className="mt-1.5 text-sm leading-7">{l.body}</p>
               </li>
@@ -167,11 +161,11 @@ export default function WorkshopPage() {
       </section>
 
       {/* 貸切利用 */}
-      <section id="private" className="cv scroll-mt-20 py-20 sm:py-28">
+      <section id="private" className="cv py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading align="left" en="Private use" title="貸切利用の料金と時間" />
           <div className="mt-9">
-            <PlanList only={["private"]} />
+            <PlanList only={["private"]} topLine={false} />
           </div>
           <dl className="rows mt-0 text-[0.95rem] [&>*:first-child]:border-t-0" data-reveal>
             <div className="grid gap-1 py-5 sm:grid-cols-[9rem_1fr]">
@@ -207,8 +201,12 @@ export default function WorkshopPage() {
           <div className="mt-9">
             <Steps items={STEPS} />
           </div>
+          <h3 id="cancel" className="mt-14 scroll-mt-6 text-xl">貸切・イベント利用のキャンセル料</h3>
+          <div className="mt-5">
+            <CancelTable caption="貸切・イベント利用のキャンセル料" rows={EVENT_CANCEL_POLICY} />
+          </div>
           <p className="mt-6 text-sm leading-7">
-            ＊キャンセル規定を含む正式な条件は、
+            ＊お支払い方法や禁止事項を含む正式な条件は、
             <Link href="/terms/event" className="link">
               イベント利用規約
             </Link>
@@ -223,9 +221,9 @@ export default function WorkshopPage() {
           <SectionHeading align="left" en="Rules" title="開催前に知っておきたい4つのこと" />
           <dl className="rows mt-9">
             {RULES.map((r) => (
-              <div key={r.title} className="py-6" data-reveal>
+              <div key={r.title} className="py-6 first:pt-0" data-reveal>
                 <dt className="font-round text-lg font-bold">{r.title}</dt>
-                <dd className="measure mt-1.5 text-[0.95rem]">{r.body}</dd>
+                <dd className="mt-1.5 text-[0.95rem]">{r.body}</dd>
               </div>
             ))}
           </dl>

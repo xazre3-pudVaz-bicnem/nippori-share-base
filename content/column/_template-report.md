@@ -10,7 +10,7 @@ date: 2026-11-01        # 実際に公開する日。検索のために日付を
 category: news          # news（お知らせ）／event／workshop／machine など
 type: report            # できごと・お知らせ
 tags: [編み会, イベントレポート]
-cover: sceneKnitting    # data/images.ts にある写真の名前
+cover: scenePattern     # data/images.ts にある写真の名前
 # instagram: https://www.instagram.com/p/xxxxxxxx/   # 同じ内容の Instagram 投稿があれば URL を書く（記事の下にボタンが出ます）
 cta:
   href: /reserve
@@ -29,7 +29,7 @@ cta:
 
 写真を入れるときは、次のように書きます（名前は data/images.ts にある写真の名前）。
 
-![写真の下に出る説明文](/photo/sceneKnitting)
+![写真の下に出る説明文](/photo/scenePattern)
 
 新しい写真を使いたいときは、README の「写真を差し替える・足す」の手順で追加してください。
 

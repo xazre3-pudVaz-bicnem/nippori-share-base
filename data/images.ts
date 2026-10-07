@@ -3,7 +3,11 @@
  * 静的 import にしているので、幅・高さ・ぼかしプレースホルダーは自動で付く。
  * 写真を差し替えるときは scripts/prepare-images.mjs の対応表を直して再生成する。
  *
- * alt は「写真に実際に写っているもの」だけを書く（写っていない設備や人数を足さない）。
+ * alt は「写真に実際に写っているもの」だけを書く（写っていない設備や人数を足さない。検索語も入れない）。
+ *
+ * すべて、実際の Nippori Share Base で撮影された写真。
+ * 旧サイトにあった利用風景の 3 枚（ミシン・編み会・レーザーのワークショップ）は AI で生成された画像と
+ * 分かったため、使っていない。実在しない場面を「利用風景」として見せないため。
  */
 import type { StaticImageData } from "next/image";
 
@@ -19,9 +23,11 @@ import layoutSeminar from "@/public/images/space/layout-seminar.jpg";
 import layoutSeminarBack from "@/public/images/space/layout-seminar-back.jpg";
 import exterior from "@/public/images/access/saito-shoten-exterior.jpg";
 import stairsSign from "@/public/images/access/stairs-sign.jpg";
-import sceneSewing from "@/public/images/scene/sewing-together.jpg";
-import sceneKnitting from "@/public/images/scene/knitting-circle.jpg";
-import sceneLaser from "@/public/images/scene/laser-workshop.jpg";
+import scenePattern from "@/public/images/scene/pattern-and-sewing.jpg";
+import cuttingPattern from "@/public/images/scene/pattern-on-cutting-table.jpg";
+import workScrunchies from "@/public/images/works/scrunchies.jpg";
+import workScissorCases from "@/public/images/works/leather-scissor-cases.jpg";
+import workPincushions from "@/public/images/works/pincushions-and-coaster.jpg";
 import logo from "@/public/images/brand/logo.png";
 
 export type Img = { src: StaticImageData; alt: string };
@@ -76,16 +82,25 @@ export const IMG = {
     src: stairsSign,
     alt: "階段の壁に付けられた木製の案内サイン。1Fから2Fの Nippori Share Base への矢印",
   },
-  sceneSewing: {
-    src: sceneSewing,
-    alt: "作業台でそれぞれミシンを使って制作する利用風景",
+  // ── 2026-10-07 に受領した写真 ──
+  scenePattern: {
+    src: scenePattern,
+    alt: "手前の裁断台に型紙と方眼の用紙を広げ、文鎮で押さえている。奥の作業台ではミシンに向かう人と、それを見ている人。トルソーにはワンピースが掛かっている",
   },
-  sceneKnitting: {
-    src: sceneKnitting,
-    alt: "大テーブルを囲み、色とりどりの毛糸玉を前に編み物をする編み会の様子",
+  cuttingPattern: {
+    src: cuttingPattern,
+    alt: "裁断台いっぱいに広げた方眼の用紙と型紙。丸い文鎮を3つ置いて押さえている",
   },
-  sceneLaser: {
-    src: sceneLaser,
-    alt: "レーザー加工した木のパーツで時計を組み立てる、子ども向けワークショップの様子",
+  workScrunchies: {
+    src: workScrunchies,
+    alt: "花柄の布をはぎ合わせて作ったシュシュ。奥に、同じ大きさに切りそろえた花柄の布が並んでいる",
+  },
+  workScissorCases: {
+    src: workScissorCases,
+    alt: "革を革ひもでかがって作った、裁ち鋏のケースが3つ。黒・茶・黄色",
+  },
+  workPincushions: {
+    src: workPincushions,
+    alt: "Nippori Share Base のロゴを彫った木の丸い板と、木の台にゴムバンドを付けたアームピンクッションが4つ。小さなミシンの置物も並んでいる",
   },
 } satisfies Record<string, Img>;

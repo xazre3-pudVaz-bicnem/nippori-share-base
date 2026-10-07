@@ -4,11 +4,12 @@ import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { planPriceText } from "@/data/pricing";
 import { buildMetadata } from "@/lib/seo";
-import { SITE, mailHref, telHref } from "@/lib/site";
+import { SITE, mailHref, telHref, walkText } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon, InstagramIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { BusText, WalkText } from "@/components/ui/WalkText";
 import { FaqList } from "@/components/sections/FaqList";
 import { MapEmbed } from "@/components/sections/MapEmbed";
 import { PageHero } from "@/components/sections/PageHero";
@@ -17,14 +18,14 @@ import { ReserveCta } from "@/components/sections/ReserveCta";
 /**
  * 担当する検索意図：Nippori Share Base アクセス（指名検索）。
  * 日暮里・東日暮里・荒川区・日暮里繊維街・齊藤商店との位置関係を、事実だけで説明する。
- * 駅からの所要時間は確認できていないので書かない（Google マップの経路案内へ送る）。
+ * 駅からの徒歩の目安・バス・駐車場・お支払い方法は、運営からの回答（2026-10-06）による。値は lib/site.ts から取る。
  */
 export const metadata: Metadata = buildMetadata({
   title: "アクセス・地図｜日暮里繊維街 齊藤商店2F",
   description:
-    "Nippori Share Base へのアクセス。所在地は〒116-0014 東京都荒川区東日暮里4-33-3 齊藤商店2F。日暮里繊維街の奥、日暮里中央通りから少し入った生地店の2階です。地図、入口と階段の写真、お問い合わせ先。",
+    `Nippori Share Base へのアクセス。${walkText}、バス停「${SITE.bus.stop}」から徒歩約${SITE.bus.minutes}分。所在地は〒${SITE.postalCode} ${SITE.addressFull}。日暮里繊維街の生地店の2階です。地図、入口と階段の写真つき。`,
   path: "/access",
-  keywords: ["Nippori Share Base アクセス", "日暮里繊維街 齊藤商店", "東日暮里 レンタルスペース", "荒川区 東日暮里"],
+  keywords: ["Nippori Share Base アクセス", "日暮里繊維街 齊藤商店", "日暮里駅 徒歩", "東日暮里 レンタルスペース", "荒川区 東日暮里"],
 });
 
 export default function AccessPage() {
@@ -34,13 +35,7 @@ export default function AccessPage() {
       <PageHero
         crumbs={[{ name: "アクセス", path: "/access" }]}
         en="Access"
-        title={
-          <>
-            日暮里繊維街、
-            <br />
-            生地店・齊藤商店の2階です
-          </>
-        }
+        title={["日暮里繊維街、", "生地店・齊藤商店の2階です"]}
         lead="Nippori Share Base は、東京都荒川区東日暮里にあります。生地や手芸材料の店が集まる日暮里繊維街のなか、生地店の2階がものづくりのスペースです。"
         img={IMG.exterior}
         position="50% 72%"
@@ -52,7 +47,7 @@ export default function AccessPage() {
           <SectionHeading align="left" en="Information" title="所在地・連絡先" />
           <div className="mt-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start lg:gap-14">
             <dl className="rows text-[0.95rem]" data-reveal>
-              <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+              <div className="grid gap-1 pb-4 sm:grid-cols-[7.5rem_1fr]">
                 <dt className="font-round font-bold">名称</dt>
                 <dd>{SITE.name}</dd>
               </div>
@@ -62,6 +57,16 @@ export default function AccessPage() {
                   〒{SITE.postalCode}
                   <br />
                   {SITE.addressFull}
+                </dd>
+              </div>
+              <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+                <dt className="font-round font-bold">最寄り駅</dt>
+                <dd>
+                  <WalkText />
+                  <span className="mt-1 block text-sm text-ash">
+                    バス：
+                    <BusText />
+                  </span>
                 </dd>
               </div>
               <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
@@ -91,13 +96,17 @@ export default function AccessPage() {
                     </span>
                   ))}
                   <span className="mt-1 block text-sm text-ash">
-                    予約できる日は
+                    お休みは{SITE.closed}です。予約できる日は
                     <Link href="/reserve" className="link">
                       空き状況カレンダー
                     </Link>
                     でご確認ください。
                   </span>
                 </dd>
+              </div>
+              <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+                <dt className="font-round font-bold">お支払い方法</dt>
+                <dd>{SITE.payments.join("、")}</dd>
               </div>
               <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
                 <dt className="font-round font-bold">運営</dt>
@@ -121,15 +130,39 @@ export default function AccessPage() {
       {/* 場所の説明 */}
       <section className="pinked bg-sun py-20 sm:py-28">
         <Container size="narrow">
-          <SectionHeading align="left" en="Nippori Textile Town" title="日暮里・東日暮里・日暮里繊維街との位置関係" />
+          <SectionHeading align="left" en="Nippori Fabric Town" title="日暮里・東日暮里・日暮里繊維街との位置関係" />
           <div className="measure mt-8 space-y-5 text-[0.95rem] sm:text-base" data-reveal>
             <p>
               日暮里繊維街は、日暮里駅の東側から東日暮里にかけて、日暮里中央通りを中心に生地・手芸材料・服飾資材の店が並ぶエリアです。Nippori Share Base がある齊藤商店は、駅から繊維街を進んだ奥のほう、「奥日暮里」とも呼ばれるあたり。日暮里中央通りから少し入ったところにあります。
             </p>
             <p>住所は荒川区東日暮里4丁目。繊維街で生地を見ながら歩いてくると、買い物の終わりごろにたどり着く場所です。</p>
-            <p>駅からの所要時間は、歩く速さや立ち寄るお店によって変わります。正確な経路と時間は、Google マップの経路案内でご確認ください。</p>
           </div>
-          <p className="mt-8">
+
+          <h3 className="mt-12 text-xl">駅・バス停からの行き方</h3>
+          <dl className="rows mt-5 text-[0.95rem] [&>*]:border-ink/30" data-reveal>
+            <div className="grid gap-1 pb-4 sm:grid-cols-[7.5rem_1fr]">
+              <dt className="font-round font-bold">電車</dt>
+              <dd>
+                <WalkText />
+              </dd>
+            </div>
+            <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+              <dt className="font-round font-bold">バス</dt>
+              <dd>
+                <BusText />
+              </dd>
+            </div>
+            <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+              <dt className="font-round font-bold">お車</dt>
+              <dd>{SITE.parking}</dd>
+            </div>
+            <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
+              <dt className="font-round font-bold">自転車</dt>
+              <dd>{SITE.bicycle}</dd>
+            </div>
+          </dl>
+          <p className="mt-5 text-sm leading-7">＊徒歩の時間は目安です。繊維街のお店に立ち寄りながら歩くと、もう少しかかります。</p>
+          <p className="mt-7">
             <a href={SITE.mapLinkUrl} target="_blank" rel="noopener noreferrer" className="btn btn-cream">
               Google マップで経路を調べる
               <ArrowIcon />
@@ -152,7 +185,7 @@ export default function AccessPage() {
                 { title: "階段のサインに沿って、2階へ", body: "階段の壁に、木でつくった「1F → 2F Nippori Share Base」の案内サインがあります。そのまま階段を上がってください。" },
                 { title: "2階が Nippori Share Base", body: "木の棚と作業台が並ぶ明るいスペースです。着いたら、スタッフにお声がけください。" },
               ].map((w, i) => (
-                <li key={w.title} className="flex gap-4 py-6" data-reveal>
+                <li key={w.title} className="flex gap-4 py-6 first:pt-0" data-reveal>
                   <span aria-hidden className="grid size-10 shrink-0 place-items-center rounded-full bg-ink text-lg font-medium text-white">
                     {i + 1}
                   </span>
@@ -168,7 +201,7 @@ export default function AccessPage() {
                 <Photo img={IMG.stairsSign} ratio="aspect-[3/4]" sizes="(max-width: 1023px) 46vw, 300px" position="50% 55%" />
                 <figcaption className="mt-2.5 text-[0.78rem] leading-6 sm:text-sm">階段の案内サイン</figcaption>
               </figure>
-              <figure className="mt-10">
+              <figure>
                 <Photo img={IMG.spaceYellowStool} ratio="aspect-[3/4]" sizes="(max-width: 1023px) 46vw, 300px" position="50% 60%" />
                 <figcaption className="mt-2.5 text-[0.78rem] leading-6 sm:text-sm">2階の Nippori Share Base</figcaption>
               </figure>

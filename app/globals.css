@@ -54,7 +54,9 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    scroll-padding-top: 5rem;
+    /* ページ内リンクの着地位置。固定ヘッダーの高さ（h-15 = 3.75rem）ぶんだけ空ける。
+       区画（section）は上の余白を自分で持っているので、scroll-mt-* を重ねないこと（重ねると前の区画が見えてしまう） */
+    scroll-padding-top: 3.75rem;
     -webkit-text-size-adjust: 100%;
   }
   body {
@@ -80,6 +82,16 @@
   }
   p {
     text-wrap: pretty;
+  }
+  /*
+   * 本文も、行が長く取れる画面（タブレット以上）では文節で折り返す（対応ブラウザのみ）。
+   * 「確定していま／せん。」のように、言葉の途中で行が変わるのを防ぐ。
+   * スマホは 1 行が 20 字ほどしかなく、文節で折り返すと行末が大きくがたつくので、成り行きのままにしている。
+   */
+  @media (min-width: 48rem) {
+    main :is(p, li, dd, dt, td, th, figcaption) {
+      word-break: auto-phrase;
+    }
   }
   :focus-visible {
     outline: 3px solid var(--color-slate);
@@ -121,8 +133,9 @@
     text-align: center;
     transition:
       transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
-      background-color 0.25s,
-      box-shadow 0.25s;
+      background-color 0.2s,
+      color 0.2s,
+      box-shadow 0.2s;
   }
   .btn:hover {
     transform: translateY(-2px);
@@ -134,22 +147,27 @@
     background: var(--color-ink);
     color: #fff;
   }
+  /* 乗せたときは色を反転させる（黒 ⇄ 白・黄 → 黒）。少し浮く動きだけだと気づきにくいため */
   .btn-ink:hover {
-    background: #3a3536;
+    background: #fff;
+    color: var(--color-ink);
+    box-shadow: inset 0 0 0 2px var(--color-ink);
   }
   .btn-sun {
     background: var(--color-sun-deep);
     color: var(--color-ink);
   }
   .btn-sun:hover {
-    background: #ffc800;
+    background: var(--color-ink);
+    color: #fff;
   }
   .btn-cream {
     background: var(--color-cream);
     color: var(--color-ink);
   }
   .btn-cream:hover {
-    background: #fff;
+    background: var(--color-ink);
+    color: #fff;
   }
   .btn-line {
     background: #fff;
@@ -157,7 +175,8 @@
     box-shadow: inset 0 0 0 2px var(--color-ink);
   }
   .btn-line:hover {
-    background: var(--color-cream);
+    background: var(--color-ink);
+    color: #fff;
   }
 
   /* 文章中のリンク：黄色の太い下線（色だけに頼らない） */
@@ -236,16 +255,33 @@
     }
   }
 
-  /* 文章の行の長さ（日本語で 1 行 36〜40 字前後）。長い説明文はこの幅に収める */
+  /*
+   * 文章の行の長さの上限。narrow のコンテナ（本文幅 44rem）ではコンテナいっぱいまで使い、
+   * 広いコンテナで 1 段組みにしたときだけ、行が長くなりすぎないように止める。
+   * 破線で区切った行（.rows）の中では使わない（線の右端より手前で文章が折り返して見えるため）。
+   */
   .measure {
-    max-width: 38em;
+    max-width: 44rem;
   }
 
-  /* 破線で区切る一覧（カードの枠の代わり） */
+  /*
+   * 文節で折り返す文字（見出し・リード文）。lib/budou.tsx が文節の切れ目に <wbr> を入れ、
+   * ここで「切れ目以外では折り返さない」ようにする。Safari など auto-phrase に対応しないブラウザでも同じ結果になる。
+   */
+  .phrase {
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+  }
+
+  /*
+   * 破線で区切る一覧（カードの枠の代わり）。線は各項目の下にだけ引く。
+   * 見出しのすぐ下に来る 1 件目の上には線を引かない（見出しの縫い目の線と重なって、線だらけに見えるため）。
+   * 見出しと一覧のあいだにリード文があるときだけ、.rows-top を足して上にも線を引く。
+   */
   .rows > * {
     border-bottom: 2px dashed rgb(35 31 32 / 0.22);
   }
-  .rows > *:first-child {
+  .rows-top > *:first-child {
     border-top: 2px dashed rgb(35 31 32 / 0.22);
   }
 
@@ -368,7 +404,8 @@
 
 @media (min-width: 64rem) {
   html {
-    scroll-padding-top: 6rem;
+    /* PC のヘッダーは 4.5rem */
+    scroll-padding-top: 4.5rem;
   }
 }
 

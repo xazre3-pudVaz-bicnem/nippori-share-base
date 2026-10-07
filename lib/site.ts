@@ -55,13 +55,32 @@ export const SITE = {
       date: "2026-09-24",
     },
   ],
-  /** 予約枠（利用規約 第7条・料金表より） */
+  /** 予約枠（利用規約 第7条・料金表・予約申込フォームより） */
   slots: [
     { name: "Team AM", time: "10:00〜13:30" },
     { name: "Team PM", time: "14:00〜17:30" },
     { name: "All Day", time: "10:00〜17:30" },
   ],
+  /**
+   * 以下は 2026-10-06 に運営（齊藤さん）からいただいた回答。出典は docs/VERIFIED_FACTS.md。
+   * お休みは決まった曜日がない（不定休）。予約できる日は空き状況カレンダーに出る。
+   */
+  closed: "不定休",
+  /** 駅からの徒歩の目安（運営の回答どおり。3駅とも約10分） */
+  walk: { stations: ["JR日暮里駅", "JR鶯谷駅", "JR三河島駅"], minutes: 10 },
+  /** バスでの行き方（運営の回答どおり） */
+  bus: {
+    routes: ["都08（錦糸町駅行き）", "里22（亀戸行き）", "草41（足立梅田〜浅草寿町）"],
+    stop: "東日暮里3丁目",
+    minutes: 3,
+  },
+  parking: "専用の駐車場はありません。お車の方は、付近のコインパーキングをご利用ください。",
+  bicycle: "駐輪場については、ご来店前に一度ご相談ください。",
+  payments: ["現金", "クレジットカード", "各種QRコード決済", "電子マネー"],
 } as const;
+
+/** 例: 「JR日暮里駅・JR鶯谷駅・JR三河島駅から徒歩約10分」 */
+export const walkText = `${SITE.walk.stations.join("・")}から徒歩約${SITE.walk.minutes}分`;
 
 export const telHref = `tel:${SITE.tel.replace(/-/g, "")}`;
 export const mailHref = `mailto:${SITE.email}`;

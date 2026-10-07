@@ -53,7 +53,7 @@ export function TermsDocument({ doc, idPrefix }: { doc: TermsDoc; idPrefix: stri
             <h2 className="sr-only">条文</h2>
           )}
           {ch.articles.map((a, ai) => (
-            <section key={a.title} id={`${idPrefix}-${offsets[ci] + ai + 1}`} className="mt-9 scroll-mt-28">
+            <section key={a.title} id={`${idPrefix}-${offsets[ci] + ai + 1}`} className="mt-9 scroll-mt-6">
               <h3 className="border-l-[6px] border-sun-deep pl-3 text-lg">{a.title}</h3>
               <div className="mt-3 space-y-3">
                 {a.blocks.map((b, i) => (

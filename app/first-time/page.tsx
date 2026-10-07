@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IMG } from "@/data/images";
 import { FAQ_GROUPS, pickFaqs } from "@/data/faqs";
+import { MENTOR, OPTIONS } from "@/data/pricing";
+import { MENTOR_STAFF } from "@/data/staff";
+import { CTA_LABEL, RESERVE_PATH, SITE } from "@/lib/site";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
@@ -9,6 +12,7 @@ import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
+import { Notes, Price } from "@/components/sections/PriceTables";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 import { Steps } from "@/components/sections/Steps";
 
@@ -38,7 +42,7 @@ const STEPS = [
   },
   {
     title: "受付とお支払い、道具の案内",
-    body: "受付で料金をお支払いください。初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。",
+    body: `受付で料金をお支払いください（${SITE.payments.join("・")}が使えます）。初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。`,
   },
   {
     title: "制作して、片付ける",
@@ -48,7 +52,7 @@ const STEPS = [
 
 const BRING = [
   { title: "生地・型紙", body: "作るものに必要な分をお持ちください。日暮里繊維街で買ってから来ることもできます。" },
-  { title: "ミシン糸", body: "原則として各自ご持参ください。試し縫い用の糸はご用意しています。忘れた場合は「いとシェア」（税込220円）もあります。" },
+  { title: "ミシン糸", body: `原則として各自ご持参ください。試し縫い用の糸はご用意しています。忘れた場合は、スペースの糸を使える「${OPTIONS[0].name}」（${OPTIONS[0].price}）もあります。` },
   { title: "副資材", body: "ファスナー、ボタン、接着芯、ゴムなど、作品に使うもの。" },
   { title: "使い慣れた道具", body: "まち針、チャコ、糸切りばさみなど。道具もお持ち込みいただけます。" },
 ];
@@ -72,13 +76,7 @@ export default function FirstTimePage() {
       <PageHero
         crumbs={[{ name: "初めての方へ", path: "/first-time" }]}
         en="First Time"
-        title={
-          <>
-            初めての方へ。
-            <br />
-            予約から当日までの流れ
-          </>
-        }
+        title={["初めての方へ。", "予約から当日までの流れ"]}
         lead="「ミシンは久しぶり」「一人で行っても平気？」——はじめての場所は、少し緊張するものです。当日の流れと、よくいただく質問をまとめました。"
         img={IMG.stairsSign}
         position="50% 55%"
@@ -92,14 +90,18 @@ export default function FirstTimePage() {
               Nippori Share Base は洋裁教室ではありません。決まった課題やカリキュラムはなく、作りたいものを、自分のペースで作る場所です。
             </p>
             <p>
-              洋裁やものづくりへのハードルを少しでも下げて、「やってみたい！」を気軽にカタチにできるように。初心者の方も、経験者の方も歓迎しています。使い方に不安がある方向けに、メンターサポートという制度もあります（内容と料金はお問い合わせください）。
+              洋裁やものづくりへのハードルを少しでも下げて、「やってみたい！」を気軽にカタチにできるように。初心者の方も、経験者の方も歓迎しています。一人で作るのが不安な方には、スタッフが製作をサポートする
+              <a href="#mentor" className="link">
+                メンターサポート
+              </a>
+              もあります。
             </p>
           </div>
 
           <h3 className="mt-12 text-lg">こんな方に、使っていただきたい場所です</h3>
           <ul className="rows mt-4 text-[0.95rem]">
             {RECOMMEND.map((r) => (
-              <li key={r} className="flex items-start gap-3 py-3.5" data-reveal>
+              <li key={r} className="flex items-start gap-3 py-3.5 first:pt-0" data-reveal>
                 <span aria-hidden className="mt-[0.72em] size-2 shrink-0 rounded-full bg-sun-deep" />
                 {r}
               </li>
@@ -123,7 +125,7 @@ export default function FirstTimePage() {
         <Container className="grid items-start gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
           <div>
             <SectionHeading align="left" en="What to bring" title="持ち物" lead="ミシン、アイロン、裁断台はスペースにあります。お持ちいただくのは、作品の材料です。" />
-            <dl className="rows mt-8">
+            <dl className="rows rows-top mt-8">
               {BRING.map((b) => (
                 <div key={b.title} className="grid gap-x-8 gap-y-1 py-5 sm:grid-cols-[9rem_1fr]" data-reveal>
                   <dt className="font-round text-lg font-bold">{b.title}</dt>
@@ -134,14 +136,40 @@ export default function FirstTimePage() {
             <p className="mt-6 text-sm leading-7">＊火気を使うもの、危険物、強い臭気を発するもの、大量の粉塵や振動が発生するものなどは、お持ち込みをお断りする場合があります。</p>
           </div>
           <div className="mx-auto w-full max-w-sm lg:max-w-none" data-reveal>
-            <Photo img={IMG.spaceYellowStool} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 384px, 420px" position="50% 60%" />
-            <p className="mt-4 text-[0.8rem] leading-6 sm:text-sm">作業台とミシン、黄色いスツール。必要なものは手の届く範囲にあります。</p>
+            <Photo img={IMG.workScissorCases} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 384px, 420px" position="50% 45%" />
+            <p className="mt-4 text-[0.8rem] leading-6 sm:text-sm">革ひもでかがったケースに入った裁ち鋏。使い慣れた道具も、お持ち込みいただけます。</p>
           </div>
         </Container>
       </section>
 
+      {/* メンターサポート（予約申込フォームと、運営からの回答に基づく。料金は data/pricing.ts） */}
+      <section id="mentor" className="cv bg-butter py-20 sm:py-28">
+        <Container size="narrow">
+          <SectionHeading align="left" en="Mentor support" title={["一人で作るのが不安な方へ。", "メンターサポート"]} lead={MENTOR.lead} />
+          <p className="mt-8 flex items-start gap-3" data-reveal>
+            <span className="pt-[0.45em] font-round font-bold">1時間</span>
+            <Price ex={MENTOR.exPerHour} />
+          </p>
+          <p className="mt-3 text-sm">ミシン利用の料金とは別に、追加でお支払いいただきます。</p>
+          <Notes items={MENTOR.notes} className="mt-6" />
+          <p className="mt-6 text-[0.95rem]">
+            メンターサポートは、スタッフの{MENTOR_STAFF.join("・")}が受け付けています。ご希望の方は、予約申込フォームでお選びください。
+          </p>
+          <p className="mt-6 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+            <Link href="/about#staff" className="link inline-flex items-center gap-1.5">
+              スタッフ紹介
+              <ArrowIcon />
+            </Link>
+            <Link href={RESERVE_PATH} className="link inline-flex items-center gap-1.5">
+              {CTA_LABEL.general}
+              <ArrowIcon />
+            </Link>
+          </p>
+        </Container>
+      </section>
+
       {/* 不安に答える */}
-      <section className="cv bg-butter py-20 sm:py-28">
+      <section className="cv py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading align="left" en="Q & A" title="はじめての方から、よくいただく質問" />
           <div className="mt-9">
@@ -150,7 +178,7 @@ export default function FirstTimePage() {
         </Container>
       </section>
 
-      <section className="cv py-20 sm:py-28">
+      <section className="cv bg-butter py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading align="left" en="More" title="予約・料金・当日のこと" />
           <div className="mt-9">

@@ -40,7 +40,7 @@ export function MachineTypeGrid({ headingLevel: H = "h3" }: { headingLevel?: "h3
               </ul>
               <Link
                 href={`/sewing-machine#${c.id}`}
-                className="mt-1.5 inline-flex items-center gap-1.5 py-1.5 text-[0.86rem] font-bold underline decoration-sun-deep decoration-[3px] underline-offset-4 sm:mt-4 sm:min-h-11 sm:w-full sm:max-w-[15rem] sm:justify-center sm:rounded-full sm:bg-sun-deep sm:px-3 sm:font-round sm:text-[0.92rem] sm:tracking-wider sm:no-underline"
+                className="mt-1.5 inline-flex items-center gap-1.5 py-1.5 text-[0.86rem] font-bold underline decoration-sun-deep decoration-[3px] underline-offset-4 sm:mt-4 sm:min-h-11 sm:w-full sm:max-w-[15rem] sm:justify-center sm:rounded-full sm:bg-sun-deep sm:px-3 sm:font-round sm:text-[0.92rem] sm:tracking-wider sm:no-underline sm:transition-[transform,background-color,color] sm:duration-200 sm:hover:-translate-y-0.5 sm:hover:bg-ink sm:hover:text-white"
               >
                 {c.short === "カバステ" ? "カバーステッチ" : c.name}一覧
                 <ArrowIcon className="size-4 sm:hidden" />

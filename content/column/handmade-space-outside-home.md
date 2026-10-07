@@ -6,7 +6,7 @@ category: handmade
 type: guide
 order: 9
 tags: [ハンドメイド 場所, 制作スペース, アトリエ, 洋裁 作業場所, 日暮里 ハンドメイド]
-cover: sceneKnitting
+cover: workScrunchies
 cta:
   href: /handmade
   label: 日暮里のハンドメイド・洋裁スペース

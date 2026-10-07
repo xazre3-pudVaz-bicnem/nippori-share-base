@@ -56,7 +56,7 @@ export default function ColumnIndexPage() {
           if (list.length === 0) return null;
           const t = COLUMN_TYPES[type];
           return (
-            <section key={type} id={type} className={`scroll-mt-20 py-20 sm:py-24 ${i % 2 === 1 ? "bg-butter" : ""}`}>
+            <section key={type} id={type} className={`py-20 sm:py-24 ${i % 2 === 1 ? "bg-butter" : ""}`}>
               <Container>
                 <div className="flex items-center gap-4 sm:gap-8">
                   <h2 className="shrink-0 text-2xl sm:text-3xl">{t.label}</h2>

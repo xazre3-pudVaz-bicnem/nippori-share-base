@@ -2,7 +2,9 @@
  * 使えるミシンの一覧（単一ソース）。
  *
  * 出典
- * - 機種名：店舗提供の機種ラベル付き写真（2026-10-02 受領）と、現在の公式サイトのミシン一覧
+ * - 機種名：店舗提供の機種ラベル付き写真（2026-10-02 受領）と、旧公式サイトのミシン一覧。
+ *   JUKI の職業用は「シュプール30DX（TL-30DX）」が正しいと運営に確認済み（2026-10-06）
+ * - 写真：旧公式サイトのミシン一覧ページに載っている、正面からの写真にそろえている
  * - 種類ごとの説明・機種ごとの説明：現在の公式サイトの文章をそのまま使用
  * - 「こんな作品に」「こんな方に」：ミシンの種類についての一般的な説明
  *
@@ -46,6 +48,8 @@ export type MachineCategory = {
   en: string;
   /** Tailwind の背景色クラス（機種ラベルの色に合わせている） */
   tone: string;
+  /** カテゴリの色。リンクに乗せたときの色などに使う（globals.css の --color-cat-* と同じ値） */
+  color: string;
   /** 現在の公式サイトの3つのポイント */
   points: string[];
   /** 現在の公式サイトの説明文 */
@@ -64,6 +68,7 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
     short: "家庭用",
     en: "Home sewing machine",
     tone: "bg-cat-home",
+    color: "var(--color-cat-home)",
     points: ["初めてでも使いやすい！", "1台でいろいろ作れる！", "おうちで気軽に楽しめる！"],
     lead: "直線縫いやジグザグ縫い、ボタンホールなど1台で何種類もの縫い方ができます。気軽にソーイングを楽しみたい方におすすめです。",
     goodFor: ["巾着・ポーチなどの布小物", "入園入学グッズ", "ボタンホールのある洋服", "飾り縫い・パッチワーク"],
@@ -93,6 +98,7 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
     short: "職業用",
     en: "Straight stitch machine",
     tone: "bg-cat-pro",
+    color: "var(--color-cat-pro)",
     points: ["プロのような美しい縫い目！", "まっすぐ縫いに特化した高性能！", "厚手の生地もパワフルに！"],
     lead: "「まっすぐ縫う」ことに特化したパワフルなミシンです。縫い目がきれいでスピードも速く、厚手の生地や長い距離もスイスイ縫えます。洋服作りを本格的に楽しみたい方や、仕上がりにこだわりたい方に人気の一台です。",
     goodFor: ["シャツ・ワンピース・コートなどの洋服", "帆布やデニムのバッグ", "カーテンなど長い距離の直線縫い", "ステッチを見せたい作品"],
@@ -117,7 +123,7 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
       {
         id: "juki-spur-30dx",
         maker: "JUKI",
-        model: "シュプール30デラックス（TL-30DX）",
+        model: "シュプール30DX（TL-30DX）",
         image: spur30,
         description:
           "扱いやすさを備えたミシンです。自動糸切り機能を搭載し、快適な作業をサポート。洋服作りはもちろん、キルトや小物作りなど、幅広い作品づくりを楽しめる一台です。",
@@ -131,6 +137,7 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
     short: "ロック",
     en: "Overlock machine",
     tone: "bg-cat-lock",
+    color: "var(--color-cat-lock)",
     points: ["布端の始末がこれ1台！", "ニット生地との相性抜群！", "既製品のような仕上がりに！"],
     lead: "布端をカットしながら、ほつれ止めまで一気に仕上げてくれるミシンです。ニット生地やTシャツ作りには欠かせない存在で、市販の服のようなきれいな仕上がりになります。",
     goodFor: ["Tシャツ・カットソーなどニットの服", "布端の始末（縁かがり）", "フリルや薄手の生地の端の始末", "裏地なしの服の縫い代始末"],
@@ -168,6 +175,7 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
     short: "カバステ",
     en: "Cover stitch machine",
     tone: "bg-cat-cover",
+    color: "var(--color-cat-cover)",
     points: ["あと一歩を叶えるミシン！", "伸びる生地もきれいに縫える！", "作品がグッと本格的に！"],
     lead: "Tシャツの裾や袖口によくある、表は2本・裏はループ状の縫い目を作れるミシンです。伸縮性のあるきれいな仕上がりになるので、ニット素材の洋服作りに大活躍。既製品のような本格的な仕上がりを目指したい方におすすめです。",
     goodFor: ["Tシャツ・スウェットの裾上げ", "袖口・襟ぐりの始末", "レギンスやスポーツウェア", "ニット服の仕上げ"],
@@ -205,8 +213,10 @@ export const MACHINE_CATEGORIES: MachineCategory[] = [
 /**
  * 期間限定で設置しているミシン。
  * 写真のラベルに「HappyJapan 様よりお借りしております」と記載がある。
- * 設置期間は確認できていないため書かない。
+ * 設置期間は、予約申込フォームに「期間限定 2026年内」と書かれている（LIMITED_UNTIL）。
  */
+export const LIMITED_UNTIL = "2026年内";
+
 export const LIMITED_MACHINES: Machine[] = [
   { id: "singer-vivace-trx-9300", maker: "SINGER", model: "VIVACE TRX-9300", image: vivace },
   { id: "singer-heavy-duty-hd4423", maker: "SINGER", model: "Heavy Duty HD4423", image: heavyDuty },

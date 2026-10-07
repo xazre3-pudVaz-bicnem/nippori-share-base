@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SITE, mailHref, telHref } from "@/lib/site";
+import { WalkText } from "@/components/ui/WalkText";
 import { ArrowIcon } from "@/components/ui/Icons";
 import { MapEmbed } from "@/components/sections/MapEmbed";
 
@@ -10,12 +11,18 @@ export function AccessBlock() {
       <div data-reveal>
         <p className="font-round text-xl font-bold tracking-wider sm:text-2xl">{SITE.name}</p>
         <dl className="rows mt-5 text-[0.95rem]">
-          <div className="grid gap-1 py-4 sm:grid-cols-[6.5rem_1fr]">
+          <div className="grid gap-1 pb-4 sm:grid-cols-[6.5rem_1fr]">
             <dt className="font-round font-bold">所在地</dt>
             <dd>
               〒{SITE.postalCode}
               <br />
               {SITE.addressFull}
+            </dd>
+          </div>
+          <div className="grid gap-1 py-4 sm:grid-cols-[6.5rem_1fr]">
+            <dt className="font-round font-bold">最寄り駅</dt>
+            <dd>
+              <WalkText />
             </dd>
           </div>
           <div className="grid gap-1 py-4 sm:grid-cols-[6.5rem_1fr]">
@@ -43,6 +50,7 @@ export function AccessBlock() {
                   {s.name}　{s.time}
                 </span>
               ))}
+              <span className="mt-1 block text-sm text-ash">{SITE.closed}（予約できる日はカレンダーでご確認ください）</span>
             </dd>
           </div>
         </dl>

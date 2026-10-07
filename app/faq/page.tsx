@@ -46,7 +46,7 @@ export default function FaqPage() {
       </PageHero>
 
       {FAQ_GROUPS.map((g, i) => (
-        <section key={g.id} id={g.id} className={`scroll-mt-20 py-16 sm:py-24 ${i % 2 === 1 ? "bg-butter" : "bg-white"} ${i > 0 ? "cv" : ""}`}>
+        <section key={g.id} id={g.id} className={`py-16 sm:py-24 ${i % 2 === 1 ? "bg-butter" : "bg-white"} ${i > 0 ? "cv" : ""}`}>
           <Container size="narrow">
             <p className="eyebrow text-sm text-ash">{g.en}</p>
             <h2 className="mt-1 text-2xl sm:text-3xl">{g.title}</h2>

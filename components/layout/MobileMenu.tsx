@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MAIN_NAV, SUB_NAV } from "@/lib/nav";
+import { MAIN_NAV, SUB_NAV, isCurrent } from "@/lib/nav";
 import { CTA_LABEL, PRIVATE_PATH, RESERVE_PATH, SITE, telHref } from "@/lib/site";
 
 /**
@@ -11,6 +11,10 @@ import { CTA_LABEL, PRIVATE_PATH, RESERVE_PATH, SITE, telHref } from "@/lib/site
  * パネルは header 基準の absolute（top-full）で開く。header の中で fixed を使うと、
  * 親の指定によっては高さが 0 に潰れて操作できなくなるため。
  */
+/** いま開いているページの項目には、黒い下線を付ける（黄色い地の上なので、黄色ではなく黒） */
+const CURRENT_MARK =
+  "font-round text-lg font-bold underline decoration-transparent decoration-[3px] underline-offset-[6px] group-data-[current=true]:decoration-ink group-aria-[current=page]:decoration-ink";
+
 export function MobileMenu() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -58,16 +62,16 @@ export function MobileMenu() {
         <nav aria-label="メインメニュー" className="mx-auto max-w-xl px-5 pb-16 pt-5">
           <ul className="rows">
             <li>
-              <Link href="/" className="flex items-baseline justify-between py-3.5">
-                <span className="font-round text-lg font-bold">ホーム</span>
+              <Link href="/" aria-current={pathname === "/" ? "page" : undefined} className="group flex items-baseline justify-between py-3.5">
+                <span className={CURRENT_MARK}>ホーム</span>
                 <span className="eyebrow text-xs text-ink/70">Home</span>
               </Link>
             </li>
             {MAIN_NAV.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} aria-current={pathname === item.href ? "page" : undefined} className="flex items-baseline justify-between gap-4 py-3.5">
+                <Link href={item.href} data-current={isCurrent(pathname, item.href)} aria-current={pathname === item.href ? "page" : undefined} className="group flex items-baseline justify-between gap-4 py-3.5">
                   <span>
-                    <span className="font-round text-lg font-bold">{item.label}</span>
+                    <span className={CURRENT_MARK}>{item.label}</span>
                     {item.description ? <span className="mt-0.5 block text-xs text-ink/75">{item.description}</span> : null}
                   </span>
                   <span className="eyebrow shrink-0 text-xs text-ink/70">{item.en}</span>
@@ -79,7 +83,12 @@ export function MobileMenu() {
           <ul className="mt-6 grid grid-cols-2 gap-x-4">
             {SUB_NAV.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="block py-2.5 font-round text-[0.95rem] font-bold underline decoration-ink/30 decoration-2 underline-offset-4">
+                <Link
+                  href={item.href}
+                  data-current={isCurrent(pathname, item.href)}
+                  aria-current={pathname === item.href ? "page" : undefined}
+                  className="block py-2.5 font-round text-[0.95rem] font-bold underline decoration-ink/30 decoration-2 underline-offset-4 data-[current=true]:decoration-ink data-[current=true]:decoration-[3px]"
+                >
                   {item.label}
                 </Link>
               </li>

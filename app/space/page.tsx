@@ -9,6 +9,7 @@ import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { WalkText } from "@/components/ui/WalkText";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
 import { Price } from "@/components/sections/PriceTables";
@@ -88,13 +89,7 @@ export default function SpacePage() {
       <PageHero
         crumbs={[{ name: "レンタルスペース", path: "/space" }]}
         en="Rental Space"
-        title={
-          <>
-            ものづくりに使える、
-            <br />
-            日暮里のレンタルスペース
-          </>
-        }
+        title={["ものづくりに使える、", "日暮里のレンタルスペース"]}
         lead="Nippori Share Base は、日暮里繊維街の生地店・齊藤商店の2階にあるレンタルスペースです。机と椅子だけの貸し会議室とは違い、ミシンやアイロン、裁断台といった道具がはじめからそろっています。"
         img={IMG.spaceTables}
         position="50% 60%"
@@ -128,15 +123,19 @@ export default function SpacePage() {
       <section className="pinked bg-sun py-20 sm:py-28">
         <Container>
           <SectionHeading align="left" en="How to use" title="作業スペースとしての、9つの使い方" lead="「つくる」「学ぶ」「ひろがる」。Nippori Share Base の3つのキーワードに沿ってご紹介します。" />
-          <div className="mt-12 space-y-12">
+          {/*
+            グループ（つくる／学ぶ・教える／ひろがる）の区切りは、見出しの列まで通した破線。
+            グループの中は項目のあいだにだけ線を引き、最後の項目の下には引かない（次のグループの線と二重にならないように）。
+          */}
+          <div className="mt-12">
             {USES.map((g) => (
-              <div key={g.group} className="grid gap-x-12 gap-y-4 lg:grid-cols-[13rem_1fr]" data-reveal>
-                <h3 className="text-2xl">
+              <div key={g.group} className="grid gap-x-12 border-t-2 border-dashed border-ink/45 pb-9 lg:grid-cols-[13rem_1fr] lg:pb-11" data-reveal>
+                <h3 className="pt-5 text-2xl">
                   「{g.group}」<span className="eyebrow mt-1 block text-sm font-normal text-ink/75">{g.en}</span>
                 </h3>
-                <dl className="rows [&>*]:border-ink/30">
-                  {g.items.map((it) => (
-                    <div key={it.title} className="grid gap-x-8 gap-y-1 py-5 sm:grid-cols-[11rem_1fr]">
+                <dl className="mt-1 lg:mt-0">
+                  {g.items.map((it, i) => (
+                    <div key={it.title} className={`grid gap-x-8 gap-y-1 py-5 sm:grid-cols-[11rem_1fr] ${i > 0 ? "border-t-2 border-dashed border-ink/25" : ""}`}>
                       <dt className="font-round text-lg font-bold">{it.title}</dt>
                       <dd className="text-[0.95rem]">{it.body}</dd>
                     </div>
@@ -145,7 +144,7 @@ export default function SpacePage() {
               </div>
             ))}
           </div>
-          <p className="mt-10 text-[0.95rem]">
+          <p className="mt-2 text-[0.95rem]">
             ミシンを使う洋裁は
             <Link href="/sewing-machine" className="link decoration-ink/40">
               ミシンのページ
@@ -164,8 +163,8 @@ export default function SpacePage() {
         <Container>
           <SectionHeading align="left" en="Layout" title="内容に合わせて、配置を変える" lead="同じスペースが、目的によってこれだけ変わります。" />
           <ul className="mt-12 grid gap-x-7 gap-y-12 md:grid-cols-3">
-            {LAYOUTS.map((l, i) => (
-              <li key={l.title} className={i === 1 ? "md:mt-10" : ""} data-reveal>
+            {LAYOUTS.map((l) => (
+              <li key={l.title} data-reveal>
                 <Photo img={l.img} ratio="aspect-[4/5]" sizes="(max-width: 767px) 100vw, 350px" />
                 <h3 className="mt-5 text-lg">{l.title}</h3>
                 <p className="mt-1.5 text-sm leading-7">{l.body}</p>
@@ -179,7 +178,7 @@ export default function SpacePage() {
       <section className="cv bg-butter py-20 sm:py-28">
         <Container size="narrow">
           <SectionHeading align="left" en="Plans" title="使い方で選ぶプラン" lead="個人で使う日も、貸切でイベントをひらく日も。料金は税込で表示しています。" />
-          <dl className="rows mt-10" data-reveal>
+          <dl className="rows rows-top mt-10" data-reveal>
             <div className="flex items-center justify-between gap-4 py-5">
               <dt>
                 <span className="font-round text-lg font-bold">ミシン利用</span>
@@ -231,6 +230,11 @@ export default function SpacePage() {
           <div className="measure mt-7 space-y-5 text-[0.95rem] sm:text-base" data-reveal>
             <p>
               所在地は {SITE.addressFull}。1階が生地店、階段を上がった2階が Nippori Share Base です。生地や副資材を買い足しながら作業できるので、イベントの材料調達にも便利です。
+            </p>
+            <p>
+              最寄り駅からは、
+              <WalkText />
+              です。
             </p>
           </div>
           <p className="mt-7">

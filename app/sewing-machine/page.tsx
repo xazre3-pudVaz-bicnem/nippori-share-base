@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
-import { LIMITED_MACHINES, MACHINE_CATEGORIES } from "@/data/machines";
-import { OPTIONS } from "@/data/pricing";
+import { LIMITED_MACHINES, LIMITED_UNTIL, MACHINE_CATEGORIES } from "@/data/machines";
+import { MENTOR, OPTIONS } from "@/data/pricing";
+import { SITE } from "@/lib/site";
+import { Budou } from "@/lib/budou";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
@@ -12,7 +14,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 import { FaqList } from "@/components/sections/FaqList";
 import { MachineNameList } from "@/components/sections/MachineCard";
 import { PageHero } from "@/components/sections/PageHero";
-import { MachinePriceTable } from "@/components/sections/PriceTables";
+import { MachinePriceTable, Price, PriceInc } from "@/components/sections/PriceTables";
 import { RelatedLinks } from "@/components/sections/RelatedLinks";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 import { Steps } from "@/components/sections/Steps";
@@ -30,7 +32,7 @@ export const metadata: Metadata = buildMetadata({
     "日暮里繊維街でミシンを使える場所、Nippori Share Base。家庭用・職業用・ロック・カバーステッチミシンを、スペース内で半日・1日単位で使えます（持ち帰りの貸し出しではありません）。買った生地をその場で裁断・縫製。",
   path: "/sewing-machine",
   og: "sewing-machine",
-  keywords: ["日暮里 ミシン", "日暮里 レンタルミシン", "日暮里 ミシン レンタル", "日暮里 ミシン 使える場所", "日暮里 繊維街 ミシン", "荒川区 ミシン"],
+  keywords: ["日暮里 ミシン", "日暮里 レンタルミシン", "日暮里 ミシン レンタル", "日暮里 ミシン 使える場所", "日暮里繊維街 ミシンレンタル", "荒川区 ミシン"],
 });
 
 const FLOW = [
@@ -40,9 +42,10 @@ const FLOW = [
     link: { href: "/reserve", label: "空き状況を見る" },
   },
   { title: "生地と糸を用意して来店", body: "生地・型紙・糸・副資材はお持ち込みください。日暮里繊維街で選んだ生地を持って、そのまま2階へ上がれます。" },
-  { title: "受付・お支払い", body: "当日の受付時にお支払いください。初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。" },
+  { title: "受付・お支払い", body: `当日の受付時にお支払いください（${SITE.payments.join("・")}が使えます）。初めて使う機種は、スタッフの説明や案内を確認してから使いはじめます。` },
   { title: "制作、そして片付け", body: "利用時間には準備と片付けも含まれます。使った道具を元の場所へ戻して終了です。" },
 ];
+
 
 export default function SewingMachinePage() {
   const faqs = pickFaqs(["take-home", "which-machine", "beginner", "thread", "break-machine", "needle"]);
@@ -51,12 +54,8 @@ export default function SewingMachinePage() {
       <PageHero
         crumbs={[{ name: "ミシン", path: "/sewing-machine" }]}
         en="Sewing Machine"
-        title={
-          <>
-            日暮里で、ミシンが使える場所
-            <span className="mt-2 block text-[0.62em] tracking-[0.08em]">スペースで使うレンタルミシン</span>
-          </>
-        }
+        title="日暮里で、ミシンが使える場所"
+        sub="スペースで使うレンタルミシン"
         lead="家庭用・職業用・ロック・カバーステッチ。日暮里繊維街の生地店の2階に、4種類のミシンをそろえています。ミシンを持ち帰るレンタルではなく、スペースに来て、半日または1日の枠で使うスタイルです。"
         img={IMG.shelfHome}
         position="50% 62%"
@@ -70,6 +69,11 @@ export default function SewingMachinePage() {
                 </a>
               </li>
             ))}
+            <li>
+              <a href="#limited" className="btn btn-cream min-h-11 px-5 py-1 text-sm">
+                期間限定
+              </a>
+            </li>
           </ul>
         </nav>
       </PageHero>
@@ -96,14 +100,14 @@ export default function SewingMachinePage() {
             </div>
           </div>
           <div data-reveal>
-            <Photo img={IMG.sceneSewing} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 460px" position="50% 40%" />
+            <Photo img={IMG.spaceYellowStool} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 460px" position="50% 60%" />
           </div>
         </Container>
       </section>
 
       {/* 種類ごと */}
       {MACHINE_CATEGORIES.map((c, i) => (
-        <section key={c.id} id={c.id} className={`scroll-mt-20 py-16 sm:py-24 ${i % 2 === 0 ? "bg-butter" : ""} ${i > 0 ? "cv" : ""}`}>
+        <section key={c.id} id={c.id} className={`py-16 sm:py-24 ${i % 2 === 0 ? "bg-butter" : ""} ${i > 0 ? "cv" : ""}`}>
           <Container>
             {/* 旧サイトと同じ、並縫いの線で挟んだ見出し */}
             <div className="flex items-center gap-4 sm:gap-8" data-reveal>
@@ -115,7 +119,9 @@ export default function SewingMachinePage() {
 
             <div className="mt-10 grid gap-x-16 gap-y-10 lg:grid-cols-[1.15fr_0.85fr]">
               <div data-reveal>
-                <p className="measure text-[0.98rem] sm:text-lg sm:leading-9">{c.lead}</p>
+                <p className="measure text-[0.98rem] sm:text-lg sm:leading-9">
+                  <Budou>{c.lead}</Budou>
+                </p>
                 <ul className="mt-6 space-y-1.5 text-[0.95rem] font-medium">
                   {c.points.map((p) => (
                     <li key={p} className="flex gap-2.5">
@@ -131,7 +137,7 @@ export default function SewingMachinePage() {
               <div data-reveal>
                 <h3 className="text-base">使える{c.name}</h3>
                 <div className="mt-3">
-                  <MachineNameList machines={c.machines} categoryName={c.name} />
+                  <MachineNameList machines={c.machines} categoryName={c.name} color={c.color} />
                 </div>
               </div>
             </div>
@@ -140,7 +146,7 @@ export default function SewingMachinePage() {
       ))}
 
       {/* 期間限定 */}
-      <section id="limited" className="cv scroll-mt-20 bg-butter py-16 sm:py-24">
+      <section id="limited" className="cv bg-butter py-16 sm:py-24">
         <Container className="grid items-center gap-x-16 gap-y-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div data-reveal>
             <Photo img={IMG.shelfSinger} ratio="aspect-[4/3]" sizes="(max-width: 1023px) 100vw, 440px" position="50% 55%" />
@@ -148,19 +154,19 @@ export default function SewingMachinePage() {
           <div data-reveal>
             <SectionHeading align="left" en="Limited time" title="期間限定で使えるミシン" />
             <p className="measure mt-6 text-[0.95rem]">
-              HappyJapan 様よりお借りしている SINGER のミシンです。設置期間が限られるため、使ってみたい機種がある方は、ご予約時にお問い合わせください。
+              HappyJapan 様よりお借りしている SINGER のミシンです。設置は{LIMITED_UNTIL}の予定です。使ってみたい機種がある方は、ご予約時にお知らせください。
             </p>
             <div className="mt-5">
-              <MachineNameList machines={LIMITED_MACHINES} categoryName="期間限定ミシン" />
+              <MachineNameList machines={LIMITED_MACHINES} categoryName="期間限定ミシン" color="var(--color-cat-limited)" topLine />
             </div>
           </div>
         </Container>
       </section>
 
       {/* 日暮里繊維街との関係 */}
-      <section id="textile-town" className="cv scroll-mt-20 py-20 sm:py-28">
+      <section id="textile-town" className="cv py-20 sm:py-28">
         <Container size="narrow">
-          <SectionHeading align="left" en="Nippori Textile Town" title="日暮里繊維街で買った生地を、その日のうちに" />
+          <SectionHeading align="left" en="Nippori Fabric Town" title="日暮里繊維街で買った生地を、その日のうちに" />
           <div className="measure mt-7 space-y-5 text-[0.95rem] sm:text-base" data-reveal>
             <p>
               日暮里繊維街を歩いていると、「この生地で何か作りたい」という気持ちが湧いてきます。ところが家に帰るころには熱が冷めて、生地は棚の中へ——そんな経験はありませんか。
@@ -192,18 +198,39 @@ export default function SewingMachinePage() {
           </div>
           <h3 className="mt-14 text-xl">安心して使うためのしくみ</h3>
           <dl className="rows mt-5 [&>*]:border-ink/30">
+            {/* メンターサポート（予約申込フォームの記載による）＋利用規約に定めのあるオプション */}
+            <div className="pb-5" data-reveal>
+              <dt className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
+                <span className="font-round text-lg font-bold">{MENTOR.name}</span>
+                <span className="flex items-start gap-2">
+                  <span className="pt-[0.3em] text-sm font-bold">1時間</span>
+                  <Price ex={MENTOR.exPerHour} size="sm" />
+                </span>
+              </dt>
+              <dd className="mt-1.5 text-[0.92rem]">
+                {MENTOR.lead}
+                {MENTOR.notes[0]}
+              </dd>
+            </div>
             {OPTIONS.map((o) => (
               <div key={o.name} className="py-5" data-reveal>
                 <dt className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-                  <span className="font-round text-lg font-bold">{o.name}</span>
-                  <span className="text-sm font-bold">{o.price}</span>
+                  <span className="font-round text-lg font-bold">
+                    {o.name}
+                    {o.sub ? <span className="ml-2 text-xs font-medium">{o.sub}</span> : null}
+                  </span>
+                  <PriceInc inc={o.inc} prefix={o.prefix} />
                 </dt>
-                <dd className="measure mt-1.5 text-[0.92rem]">{o.body}</dd>
+                <dd className="mt-1.5 text-[0.92rem]">{o.body}</dd>
               </div>
             ))}
           </dl>
-          <p className="mt-8">
-            <Link href="/price" className="link inline-flex items-center gap-1.5 text-sm decoration-ink/40">
+          <p className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+            <Link href="/first-time#mentor" className="link inline-flex items-center gap-1.5 decoration-ink/40">
+              メンターサポートについて
+              <ArrowIcon />
+            </Link>
+            <Link href="/price" className="link inline-flex items-center gap-1.5 decoration-ink/40">
               ミシンを使わないプランも含めた料金表
               <ArrowIcon />
             </Link>

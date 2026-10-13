@@ -6,6 +6,7 @@ import { pickFaqs } from "@/data/faqs";
 import { MACHINE_PLANS, MENTOR, planById, priceText } from "@/data/pricing";
 import { getAllColumns } from "@/lib/columns";
 import { Budou, BudouLines } from "@/lib/budou";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata, formatDateJa } from "@/lib/seo";
 import { CTA_LABEL, RESERVE_PATH, SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -28,7 +29,7 @@ export const metadata: Metadata = buildMetadata({
   rawTitle: true,
   description: SITE.description,
   path: "/",
-  keywords: ["日暮里 レンタルスペース", "日暮里 ものづくり", "日暮里 シェアスペース", "日暮里繊維街 レンタルスペース"],
+  keywords: pageKeywords("/"),
 });
 
 /** できること（旧サイトの文章をそのまま使用） */

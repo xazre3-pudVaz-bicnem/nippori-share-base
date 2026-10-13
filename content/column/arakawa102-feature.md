@@ -6,6 +6,8 @@ category: news
 type: report
 order: 0
 tags: [メディア掲載, 荒川102, お知らせ]
+keyword: Nippori Share Base メディア掲載
+parent: /about
 cover: exterior
 cta:
   href: /about

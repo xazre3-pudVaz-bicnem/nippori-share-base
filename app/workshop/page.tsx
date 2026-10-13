@@ -3,12 +3,14 @@ import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { EVENT_CANCEL_POLICY, planPriceText } from "@/data/pricing";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { CTA_LABEL, PRIVATE_PATH, SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon, ExternalIcon, InstagramIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
 import { CancelTable, PlanList } from "@/components/sections/PriceTables";
@@ -26,7 +28,7 @@ export const metadata: Metadata = buildMetadata({
     "日暮里繊維街でワークショップや講座、展示会、販売会をひらくなら Nippori Share Base。作業台とミシンがそろい、レイアウトも自由。荒川区でワークショップ会場をお探しの主催者さまは、貸切利用をご相談ください。",
   path: "/workshop",
   og: "workshop",
-  keywords: ["日暮里 ワークショップ", "日暮里 ワークショップ スペース", "日暮里 イベントスペース", "日暮里 展示会", "日暮里 販売会", "荒川区 ワークショップ"],
+  keywords: pageKeywords("/workshop"),
 });
 
 /** イベント利用規約 第1条の利用目的 */
@@ -252,6 +254,7 @@ export default function WorkshopPage() {
               ]}
             />
           </div>
+          <ClusterColumns parent="/workshop" title="ワークショップ・イベントのコラム" exclude={["how-to-choose-workshop-venue"]} more={{ href: "/column/category/workshop", label: "ワークショップのコラム一覧" }} />
         </Container>
       </section>
 

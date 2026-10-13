@@ -30,7 +30,8 @@ import workScissorCases from "@/public/images/works/leather-scissor-cases.jpg";
 import workPincushions from "@/public/images/works/pincushions-and-coaster.jpg";
 import logo from "@/public/images/brand/logo.png";
 
-export type Img = { src: StaticImageData; alt: string };
+/** note … 写真について確認できている事実（alt とは別。写っているもの以外の情報。コラムの自動生成にも渡す） */
+export type Img = { src: StaticImageData; alt: string; note?: string };
 
 export const IMG = {
   logo: { src: logo, alt: "Nippori Share Base のロゴ。3つの手が黄色い布を広げているイラスト" },
@@ -102,5 +103,6 @@ export const IMG = {
   workPincushions: {
     src: workPincushions,
     alt: "Nippori Share Base のロゴを彫った木の丸い板と、木の台にゴムバンドを付けたアームピンクッションが4つ。小さなミシンの置物も並んでいる",
+    note: "ロゴの板とアームピンクッションの木の台は、スペースのレーザー加工機で作ったもの（2026-10-09 に運営へ確認）",
   },
 } satisfies Record<string, Img>;

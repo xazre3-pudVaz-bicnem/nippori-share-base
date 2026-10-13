@@ -29,6 +29,11 @@ export const SITE = {
   tel: "03-3803-4007",
   /** 電話は1階の齊藤商店につながる */
   telNote: "齊藤商店",
+  /**
+   * 齊藤商店の営業の終わり（2026-10-09 に運営へ確認）。電話はこの時間まで。
+   * Nippori Share Base の利用は 17:30 まで（下の slots）で、齊藤商店の営業時間とは別。
+   */
+  telUntil: "17:00",
   email: "sharebase.nippori@gmail.com",
   instagram: "https://www.instagram.com/sharebase_nippori/",
   instagramHandle: "@sharebase_nippori",

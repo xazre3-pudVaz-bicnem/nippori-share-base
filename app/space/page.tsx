@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { MACHINE_PLANS, OTHER_PLANS } from "@/data/pricing";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -10,6 +11,7 @@ import { ArrowIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { WalkText } from "@/components/ui/WalkText";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
 import { Price } from "@/components/sections/PriceTables";
@@ -17,17 +19,17 @@ import { RelatedLinks } from "@/components/sections/RelatedLinks";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 
 /**
- * 担当する検索意図：日暮里 レンタルスペース（＋レンタルルーム／貸しスペース／作業スペース／荒川区）。
+ * 担当する検索意図：日暮里 レンタルスペース／レンタルルーム（＋貸しスペース／作業スペース／アトリエ／荒川区）。一覧は lib/keywords.ts。
  * 「会議室・パーティールームではなく、ものづくりに使える場所」という違いを伝えるページ。
  * ミシンの機種や洋裁の進め方は書かない（/sewing-machine・/handmade の担当）。
  */
 export const metadata: Metadata = buildMetadata({
-  title: "日暮里のレンタルスペース｜ものづくり・洋裁・作業に",
+  title: "日暮里のレンタルスペース・レンタルルーム｜ものづくりと作業に",
   description:
     "日暮里繊維街・東日暮里のレンタルスペース。作業台とミシン、裁断台がそろい、作品制作や共同作業、展示会・販売会に使えます。荒川区で、ものづくり向けの貸しスペース・作業スペースをお探しの方へ。",
   path: "/space",
   og: "space",
-  keywords: ["日暮里 レンタルスペース", "日暮里 レンタルルーム", "日暮里 貸しスペース", "日暮里 作業スペース", "荒川区 レンタルスペース"],
+  keywords: pageKeywords("/space"),
 });
 
 const FEATURES = [
@@ -268,6 +270,7 @@ export default function SpacePage() {
               ]}
             />
           </div>
+          <ClusterColumns parent="/space" title="スペースの使い方のコラム" more={{ href: "/column", label: "コラム・お知らせの一覧" }} />
         </Container>
       </section>
 

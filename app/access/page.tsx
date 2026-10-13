@@ -3,6 +3,7 @@ import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { planPriceText } from "@/data/pricing";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { SITE, mailHref, telHref, walkText } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
@@ -10,6 +11,7 @@ import { ArrowIcon, InstagramIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { BusText, WalkText } from "@/components/ui/WalkText";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { MapEmbed } from "@/components/sections/MapEmbed";
 import { PageHero } from "@/components/sections/PageHero";
@@ -25,7 +27,7 @@ export const metadata: Metadata = buildMetadata({
   description:
     `Nippori Share Base へのアクセス。${walkText}、バス停「${SITE.bus.stop}」から徒歩約${SITE.bus.minutes}分。所在地は〒${SITE.postalCode} ${SITE.addressFull}。日暮里繊維街の生地店の2階です。地図、入口と階段の写真つき。`,
   path: "/access",
-  keywords: ["Nippori Share Base アクセス", "日暮里繊維街 齊藤商店", "日暮里駅 徒歩", "東日暮里 レンタルスペース", "荒川区 東日暮里"],
+  keywords: pageKeywords("/access"),
 });
 
 export default function AccessPage() {
@@ -76,7 +78,7 @@ export default function AccessPage() {
                     {SITE.tel}
                   </a>
                   <span className="text-sm">（{SITE.telNote}）</span>
-                  <span className="mt-1 block text-sm text-ash">1階の齊藤商店につながります。「Nippori Share Base の件」とお伝えください。</span>
+                  <span className="mt-1 block text-sm text-ash">1階の齊藤商店につながります（齊藤商店の営業は{SITE.telUntil}まで）。「Nippori Share Base の件」とお伝えください。</span>
                 </dd>
               </div>
               <div className="grid gap-1 py-4 sm:grid-cols-[7.5rem_1fr]">
@@ -230,6 +232,7 @@ export default function AccessPage() {
               <ArrowIcon />
             </Link>
           </p>
+          <ClusterColumns parent="/access" title="日暮里繊維街のコラム" exclude={["why-nippori-is-called-textile-town"]} more={{ href: "/column/category/textile-town", label: "日暮里繊維街のコラム一覧" }} />
         </Container>
       </section>
 

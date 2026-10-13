@@ -5,7 +5,7 @@ import { COLUMN_CATEGORIES, getActiveCategories, getColumnsByCategory, isCategor
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
-import { ColumnCard } from "@/components/sections/ColumnCard";
+import { ColumnList } from "@/components/sections/ColumnList";
 import { PageHero } from "@/components/sections/PageHero";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 
@@ -59,13 +59,7 @@ export default async function ColumnCategoryPage({ params }: Props) {
       <section className="py-16 sm:py-24">
         <Container>
           <h2 className="sr-only">{c.label}の記事一覧</h2>
-          <ul className="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-            {columns.map((col) => (
-              <li key={col.slug}>
-                <ColumnCard column={col} />
-              </li>
-            ))}
-          </ul>
+          <ColumnList columns={columns} cards={12} gridClassName="grid gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3" />
 
           <nav aria-label="ほかのカテゴリ" className="mt-16 border-t-2 border-dashed border-ink/25 pt-8">
             <h2 className="text-lg">ほかのカテゴリ</h2>

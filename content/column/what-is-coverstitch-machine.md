@@ -6,6 +6,8 @@ category: machine
 type: guide
 order: 5
 tags: [カバーステッチミシン, ロックミシン 違い, ニットソーイング, 裾上げ]
+keyword: カバーステッチミシン とは
+parent: /sewing-machine
 cover: shelfLock
 cta:
   href: /sewing-machine#cover

@@ -12,3 +12,5 @@ npm-debug.log*
 next-env.d.ts
 # 修正依頼書などの PDF（10MB ほどあるので、リポジトリには入れない）
 /docs/requests/*.pdf
+# コラムの自動生成の作業ファイル（下書きと校閲の記録）
+/.daily-blog/

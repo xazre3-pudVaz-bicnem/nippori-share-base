@@ -7,6 +7,8 @@ category: machine
 type: guide
 order: 4
 tags: [ミシン 購入前, ミシン 試し縫い, 職業用ミシン, ロックミシン, 日暮里 レンタルミシン]
+keyword: ミシン 買う前 試す
+parent: /sewing-machine
 cover: spaceYellowStool
 cta:
   href: /sewing-machine

@@ -89,6 +89,10 @@ export function localBusinessSchema(): Json {
       { "@type": "Place", name: "日暮里繊維街" },
     ],
     priceRange: priceRange(),
+    // お支払い方法（/access・/price に表示しているもの）
+    paymentAccepted: SITE.payments.join("、"),
+    // 生地店・齊藤商店の 2 階にある
+    containedInPlace: { "@type": "Store", name: SITE.operator, address: postalAddress },
     amenityFeature: AMENITIES.map((name) => ({ "@type": "LocationFeatureSpecification", name, value: true })),
     sameAs: [SITE.instagram],
     parentOrganization: { "@id": id("organization") },
@@ -149,6 +153,7 @@ export function articleSchema(input: {
   datePublished: string;
   dateModified?: string;
   section?: string;
+  keywords?: string[];
 }): Json {
   return {
     "@type": "Article",
@@ -158,7 +163,9 @@ export function articleSchema(input: {
     datePublished: input.datePublished,
     dateModified: input.dateModified ?? input.datePublished,
     articleSection: input.section,
+    keywords: input.keywords && input.keywords.length > 0 ? input.keywords.join(", ") : undefined,
     inLanguage: "ja",
+    isPartOf: { "@id": id("website") },
     mainEntityOfPage: absoluteUrl(input.path),
     // 書き手は運営している Nippori Share Base 自身（/about に運営の説明がある）
     author: { "@type": "Organization", "@id": id("organization"), name: SITE.name, url: absoluteUrl("/about") },

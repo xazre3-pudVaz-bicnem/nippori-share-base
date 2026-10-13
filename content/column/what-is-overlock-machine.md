@@ -6,6 +6,8 @@ category: machine
 type: guide
 order: 2
 tags: [ロックミシン, ミシン 種類, ニットソーイング, 日暮里 ミシン]
+keyword: ロックミシン とは
+parent: /sewing-machine
 cover: shelfLock
 cta:
   href: /sewing-machine#lock

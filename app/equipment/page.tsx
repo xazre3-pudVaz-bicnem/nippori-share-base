@@ -5,12 +5,14 @@ import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { ALL_MACHINE_NAMES, LIMITED_MACHINES, LIMITED_UNTIL, MACHINE_CATEGORIES } from "@/data/machines";
 import { itemListSchema } from "@/lib/schema";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { MachineCard } from "@/components/sections/MachineCard";
 import { PageHero } from "@/components/sections/PageHero";
@@ -27,7 +29,7 @@ export const metadata: Metadata = buildMetadata({
     "Nippori Share Base の設備一覧。JANOME・JUKI・brother・baby lock の家庭用／職業用／ロック／カバーステッチミシンの機種名と特徴、アイロン、裁断台、レーザー加工機、カッティングマシーンを紹介します。",
   path: "/equipment",
   og: "sewing-machine",
-  keywords: ["日暮里 ミシン 設備", "日暮里 洋裁 設備", "日暮里 ロックミシン", "日暮里 カバーステッチミシン", "日暮里 レーザー加工機"],
+  keywords: pageKeywords("/equipment"),
 });
 
 const TOOLS = EQUIPMENT.slice(4, 8);
@@ -171,7 +173,7 @@ export default function EquipmentPage() {
         <Container className="grid items-start gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
           <div data-reveal>
             <Photo img={IMG.workPincushions} swatch="sun" ratio="aspect-[4/5]" sizes="(max-width: 1023px) 100vw, 420px" position="50% 40%" />
-            <p className="mt-4 text-[0.8rem] leading-6 sm:text-sm">スペースのロゴを彫った木の板と、木の台を使ったアームピンクッション。</p>
+            <p className="mt-4 text-[0.8rem] leading-6 sm:text-sm">スペースのレーザー加工機で作った、ロゴを彫った木の板と、アームピンクッションの木の台。</p>
           </div>
           <div>
             <SectionHeading align="left" en="Digital fabrication" title="洋裁以外のものづくりに" lead="レーザー加工機とカッティングマシーンがあります。レーザー加工はオーダー制、カッティングマシーンは時間単位でのご利用です。" />
@@ -216,6 +218,7 @@ export default function EquipmentPage() {
           <div className="mt-9">
             <FaqList items={faqs} />
           </div>
+          <ClusterColumns parent="/equipment" title="設備・道具のコラム" more={{ href: "/column", label: "コラム・お知らせの一覧" }} />
         </Container>
       </section>
 

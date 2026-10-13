@@ -5,7 +5,7 @@
  * 存在を確認できたものだけ。台数・機種・利用条件が確認できないものは、その項目を書かずに
  * 「お問い合わせください」と案内する。新しい設備を足すときは出典を source に残すこと。
  */
-import { CUTTING_MACHINE, LASER, yen } from "@/data/pricing";
+import { CUTTING_MACHINE, LASER, laserPriceText, yen } from "@/data/pricing";
 
 export type Equipment = {
   id: string;
@@ -109,10 +109,10 @@ export const EQUIPMENT: Equipment[] = [
     details: [
       { label: "ご利用の形", body: "オーダー注文のみ（体験利用は行っていません）" },
       { label: "加工できる素材", body: `${LASER.materials.join("・")}。そのほかの素材は機械の調整が必要なため、要相談のうえ試作の時間をいただきます。` },
-      { label: "料金", body: `材料費 ＋ レーザー加工時間1分につき${yen(LASER.perMinute)}円 ＋ 加工手数料${yen(LASER.feePerData)}円（1データにつき）` },
+      { label: "料金", body: `${laserPriceText}。税抜では、加工時間1分につき${yen(LASER.perMinuteEx)}円、加工手数料${yen(LASER.feePerDataEx)}円です。` },
     ],
     ask: "スペースにある材料も含めて、柔軟にご相談をお受けします。お気軽にお問い合わせください。",
-    source: "運営の回答（2026-10-06）／公式サイト「できること」",
+    source: "運営の回答（2026-10-06。料金が税抜であることは 2026-10-09 に確認）／公式サイト「できること」",
   },
   {
     id: "cutting-machine",

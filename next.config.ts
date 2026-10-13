@@ -19,6 +19,12 @@ const PRODUCTION_URL = "https://www.nipporisharebase.com";
  * Vercel が教えてくれる VERCEL_PROJECT_PRODUCTION_URL も使わない（www なしのドメインが返ることがあり、
  * 転送元の URL を canonical にしてしまうため）。
  */
+/**
+ * Vercel が自動で付ける本番用の URL。本番と同じ内容がここでも開けてしまうので、正式なドメインへ転送する
+ * （プレビュー用の *.vercel.app は転送しない。そちらは noindex のヘッダーで検索に出ないようにしている）。
+ */
+const VERCEL_ALIAS_HOST = "nippori-share-base.vercel.app";
+
 const explicitUrl = (process.env.NEXT_PUBLIC_SITE_URL || "").trim();
 const siteUrl = (explicitUrl || (process.env.VERCEL_ENV === "production" ? PRODUCTION_URL : "")).replace(/\/+$/, "");
 const productionHost = siteUrl ? new URL(siteUrl).host : "";
@@ -43,6 +49,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     // 写真は 65、ロゴなど線画は既定の 75
     qualities: [65, 75],
+  },
+  async redirects() {
+    // 本番 URL が決まっているビルド（＝本番デプロイ）のときだけ。転送先が自分自身にならないことも確かめる
+    if (!siteUrl || productionHost === VERCEL_ALIAS_HOST) return [];
+    return [{ source: "/:path*", has: [{ type: "host", value: VERCEL_ALIAS_HOST }], destination: `${siteUrl}/:path*`, permanent: true }];
   },
   async headers() {
     return [

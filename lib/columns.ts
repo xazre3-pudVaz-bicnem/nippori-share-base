@@ -62,6 +62,14 @@ export type ColumnMeta = {
   readingMinutes: number;
   /** 同じ日付の記事の並び順（小さいほど先）。省略時は 999 */
   order: number;
+  /** この記事が答える検索意図（1 記事 1 つ）。関連記事の判定と、記事どうしの重なりの確認に使う */
+  keyword?: string;
+  /** 親になる固定ページのパス（例: /sewing-machine）。そのページの「このテーマのコラム」に出る */
+  parent?: string;
+  /** data/blog-topics.json のテーマ id（自動生成の記事） */
+  topic?: string;
+  /** 自動生成の記事なら true（scripts/generate-daily-blog.mjs が付ける） */
+  auto: boolean;
 };
 
 export type Column = ColumnMeta & { body: string; headings: { id: string; text: string }[] };
@@ -118,6 +126,10 @@ function load(file: string): Column {
     forOrganizers: category === "workshop" || category === "event",
     readingMinutes: Math.max(1, Math.round(chars / 500)),
     order: typeof data.order === "number" ? data.order : 999,
+    keyword: typeof data.keyword === "string" && data.keyword.trim() ? data.keyword.trim() : undefined,
+    parent: typeof data.parent === "string" && data.parent.startsWith("/") ? data.parent.split("#")[0] : undefined,
+    topic: typeof data.topic === "string" ? data.topic : undefined,
+    auto: data.auto === true,
     body,
     headings,
   };
@@ -129,7 +141,8 @@ let cache: Column[] | null = null;
 export function getAllColumns(): Column[] {
   if (cache && process.env.NODE_ENV === "production") return cache;
   if (!fs.existsSync(DIR)) return [];
-  const today = new Date().toISOString().slice(0, 10);
+  // 「今日」は日本時間で判定する（記事の date は日本の日付。UTC で比べると、朝 9 時より前のビルドで当日の記事が出ない）
+  const today = new Date(Date.now() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
   const list = fs
     .readdirSync(DIR)
     .filter((f) => f.endsWith(".md") && !f.startsWith("_") && f !== "README.md")
@@ -164,9 +177,51 @@ export function isCategoryIndexable(category: ColumnCategory): boolean {
   return getColumnsByCategory(category).length >= CATEGORY_INDEX_MIN;
 }
 
-/** 同じカテゴリ・同じタグを優先して関連記事を選ぶ */
+/** 検索意図（keyword）とタグを、空白で区切った言葉の集まりにする */
+function terms(c: Pick<ColumnMeta, "keyword" | "tags">): Set<string> {
+  return new Set([c.keyword ?? "", ...c.tags].flatMap((t) => t.split(/[\s　]+/)).filter((t) => t.length >= 2));
+}
+
+/**
+ * 関連記事（あわせて読みたい）。カテゴリだけでなく、親ページ・検索意図・タグの重なりで選ぶ。
+ * - 親ページが同じ（同じテーマのまとまり）…… +4
+ * - カテゴリが同じ …… +3
+ * - 検索意図・タグの言葉が重なる …… 1 語につき +1.5（最大 +6）
+ * - 記事の種類が同じ …… +1
+ * 点が同じときは、手で書いた記事 → 新しい記事の順（記事が増えても、選ばれ方が日によって変わらないように）。
+ */
 export function getRelatedColumns(column: Column, limit = 3): Column[] {
-  const others = getAllColumns().filter((c) => c.slug !== column.slug);
-  const score = (c: Column) => (c.category === column.category ? 2 : 0) + (c.type === column.type ? 1 : 0) + c.tags.filter((t) => column.tags.includes(t)).length;
-  return others.sort((a, b) => score(b) - score(a)).slice(0, limit);
+  const mine = terms(column);
+  const score = (c: Column) => {
+    let shared = 0;
+    for (const t of terms(c)) if (mine.has(t)) shared++;
+    return (column.parent && c.parent === column.parent ? 4 : 0) + (c.category === column.category ? 3 : 0) + Math.min(6, shared * 1.5) + (c.type === column.type ? 1 : 0);
+  };
+  return getAllColumns()
+    .filter((c) => c.slug !== column.slug)
+    .map((c) => ({ c, s: score(c) }))
+    .sort((a, b) => b.s - a.s || Number(a.c.auto) - Number(b.c.auto) || (a.c.date < b.c.date ? 1 : a.c.date > b.c.date ? -1 : a.c.slug.localeCompare(b.c.slug)))
+    .slice(0, limit)
+    .map((x) => x.c);
+}
+
+/**
+ * 固定ページ（parent）を親にしているコラム。固定ページの「このテーマのコラム」に出す。
+ * 手で書いた記事（柱になる記事）を先に、そのあと新しい順。
+ */
+export function getColumnsByParent(parent: string): Column[] {
+  return getAllColumns()
+    .filter((c) => c.parent === parent)
+    .sort((a, b) => Number(a.auto) - Number(b.auto) || (a.auto ? (a.date < b.date ? 1 : a.date > b.date ? -1 : 0) : a.order - b.order) || a.slug.localeCompare(b.slug));
+}
+
+/**
+ * ある言葉（例: ロックミシン）をいちばん正面から説明しているコラムを 1 本選ぶ。
+ * 固定ページの文中から「くわしく読む」リンクを張るときに使う。無ければ undefined。
+ */
+export function findGuideFor(term: string, parent?: string): Column | undefined {
+  const score = (c: Column) => (c.title.startsWith(`${term}とは`) ? 4 : 0) + (c.keyword?.startsWith(term) ? 2 : 0) + (c.title.includes(term) ? 1 : 0);
+  return getAllColumns()
+    .filter((c) => (!parent || c.parent === parent) && score(c) > 0)
+    .sort((a, b) => score(b) - score(a) || Number(a.auto) - Number(b.auto) || a.order - b.order)[0];
 }

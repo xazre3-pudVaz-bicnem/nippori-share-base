@@ -5,7 +5,7 @@ import { buildMetadata } from "@/lib/seo";
 import { SITE } from "@/lib/site";
 import { Container } from "@/components/ui/Container";
 import { InstagramIcon } from "@/components/ui/Icons";
-import { ColumnCard } from "@/components/sections/ColumnCard";
+import { ColumnList } from "@/components/sections/ColumnList";
 import { PageHero } from "@/components/sections/PageHero";
 import { ReserveCta } from "@/components/sections/ReserveCta";
 
@@ -63,13 +63,9 @@ export default function ColumnIndexPage() {
                   <span className="stitch flex-1 text-ink/35" aria-hidden />
                 </div>
                 <p className="measure mt-3 text-[0.95rem]">{t.lead}</p>
-                <ul className="mt-10 grid gap-x-9 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-                  {list.map((c) => (
-                    <li key={c.slug}>
-                      <ColumnCard column={c} />
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-10">
+                  <ColumnList columns={list} cards={9} />
+                </div>
                 {type === "report" ? (
                   <p className="mt-10 text-sm">
                     <a href={SITE.instagram} target="_blank" rel="noopener noreferrer" className="link inline-flex items-center gap-1.5">

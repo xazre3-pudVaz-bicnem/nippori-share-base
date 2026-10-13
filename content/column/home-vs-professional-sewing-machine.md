@@ -6,6 +6,8 @@ category: machine
 type: guide
 order: 1
 tags: [家庭用ミシン, 職業用ミシン, ミシン 選び方, 日暮里 ミシン]
+keyword: 家庭用ミシン 職業用ミシン 違い
+parent: /sewing-machine
 cover: shelfHome
 cta:
   href: /sewing-machine

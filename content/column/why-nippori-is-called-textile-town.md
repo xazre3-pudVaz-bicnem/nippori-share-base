@@ -6,6 +6,8 @@ category: textile-town
 type: local
 order: 6
 tags: [日暮里繊維街, 日暮里 ものづくり, 日暮里 生地, 東日暮里]
+keyword: 日暮里繊維街 歴史
+parent: /access
 cover: exterior
 cta:
   href: /access

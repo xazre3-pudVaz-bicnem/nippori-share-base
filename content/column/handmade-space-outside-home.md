@@ -6,6 +6,8 @@ category: handmade
 type: guide
 order: 9
 tags: [ハンドメイド 場所, 制作スペース, アトリエ, 洋裁 作業場所, 日暮里 ハンドメイド]
+keyword: ハンドメイド 作業場所
+parent: /handmade
 cover: workScrunchies
 cta:
   href: /handmade

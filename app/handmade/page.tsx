@@ -3,11 +3,13 @@ import Link from "next/link";
 import { IMG } from "@/data/images";
 import { pickFaqs } from "@/data/faqs";
 import { planPriceText } from "@/data/pricing";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { PageHero } from "@/components/sections/PageHero";
 import { PlanList } from "@/components/sections/PriceTables";
@@ -24,7 +26,7 @@ export const metadata: Metadata = buildMetadata({
     "日暮里で洋裁やハンドメイドを楽しむ制作スペース。一人で集中するソーイングにも、仲間と集まる編み会や手芸の時間にも。広い作業台と裁断台がそろい、アトリエのように使えます。",
   path: "/handmade",
   og: "handmade",
-  keywords: ["日暮里 洋裁", "日暮里 ハンドメイド", "日暮里 制作スペース", "日暮里 ソーイング", "日暮里 アトリエ", "日暮里 手芸"],
+  keywords: pageKeywords("/handmade"),
 });
 
 const CRAFTS = [
@@ -155,9 +157,13 @@ export default function HandmadePage() {
           <div className="mt-10">
             <PlanList only={["handmade", "cutting", "break"]} />
           </div>
-          <p className="mt-9">
-            <Link href="/price" className="link inline-flex items-center gap-1.5 text-sm">
+          <p className="mt-9 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+            <Link href="/price" className="link inline-flex items-center gap-1.5">
               ミシン利用を含む料金表
+              <ArrowIcon />
+            </Link>
+            <Link href="/equipment" className="link inline-flex items-center gap-1.5">
+              設備・道具の一覧
               <ArrowIcon />
             </Link>
           </p>
@@ -212,6 +218,7 @@ export default function HandmadePage() {
               ]}
             />
           </div>
+          <ClusterColumns parent="/handmade" title="洋裁・ハンドメイドのコラム" exclude={["handmade-space-outside-home", "large-work-table-benefits"]} more={{ href: "/column", label: "コラム・お知らせの一覧" }} />
         </Container>
       </section>
 

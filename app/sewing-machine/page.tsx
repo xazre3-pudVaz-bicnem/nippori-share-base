@@ -6,11 +6,14 @@ import { LIMITED_MACHINES, LIMITED_UNTIL, MACHINE_CATEGORIES } from "@/data/mach
 import { MENTOR, OPTIONS } from "@/data/pricing";
 import { SITE } from "@/lib/site";
 import { Budou } from "@/lib/budou";
+import { findGuideFor } from "@/lib/columns";
+import { pageKeywords } from "@/lib/keywords";
 import { buildMetadata } from "@/lib/seo";
 import { Container } from "@/components/ui/Container";
 import { ArrowIcon } from "@/components/ui/Icons";
 import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { ClusterColumns } from "@/components/sections/ClusterColumns";
 import { FaqList } from "@/components/sections/FaqList";
 import { MachineNameList } from "@/components/sections/MachineCard";
 import { PageHero } from "@/components/sections/PageHero";
@@ -20,7 +23,7 @@ import { ReserveCta } from "@/components/sections/ReserveCta";
 import { Steps } from "@/components/sections/Steps";
 
 /**
- * 担当する検索意図：日暮里 ミシン／日暮里 レンタルミシン（＋ミシン レンタル、使える場所、繊維街 ミシン、荒川区 ミシン）。
+ * 担当する検索意図：日暮里 ミシン／日暮里 レンタルミシン（＋ミシン レンタル、使える場所、種類名、繊維街 ミシン）。一覧は lib/keywords.ts。
  *
  * 「レンタルミシン」で探す人には、持ち帰りの貸し出しを想像している人もいる。
  * ここは「スペースに来て使う」場所なので、ページの冒頭ではっきり書く（誤解させる書き方はしない）。
@@ -32,7 +35,7 @@ export const metadata: Metadata = buildMetadata({
     "日暮里繊維街でミシンを使える場所、Nippori Share Base。家庭用・職業用・ロック・カバーステッチミシンを、スペース内で半日・1日単位で使えます（持ち帰りの貸し出しではありません）。買った生地をその場で裁断・縫製。",
   path: "/sewing-machine",
   og: "sewing-machine",
-  keywords: ["日暮里 ミシン", "日暮里 レンタルミシン", "日暮里 ミシン レンタル", "日暮里 ミシン 使える場所", "日暮里繊維街 ミシンレンタル", "荒川区 ミシン"],
+  keywords: pageKeywords("/sewing-machine"),
 });
 
 const FLOW = [
@@ -49,6 +52,9 @@ const FLOW = [
 
 export default function SewingMachinePage() {
   const faqs = pickFaqs(["take-home", "which-machine", "beginner", "thread", "break-machine", "needle"]);
+  // 種類ごとに、その種類をいちばん正面から説明しているコラムへ案内する（記事が増えたら自動で入れ替わる）
+  const guides = Object.fromEntries(MACHINE_CATEGORIES.map((c) => [c.id, findGuideFor(c.name, "/sewing-machine")]));
+  const linked = [...new Set(Object.values(guides).flatMap((g) => (g ? [g.slug] : [])))];
   return (
     <>
       <PageHero
@@ -133,6 +139,14 @@ export default function SewingMachinePage() {
                 <h3 className="mt-8 text-base">こんな作品・作業に</h3>
                 <p className="measure mt-2 text-[0.95rem]">{c.goodFor.join("、")}。</p>
                 <p className="measure mt-3 text-sm leading-7 text-ash">{c.recommend}</p>
+                {guides[c.id] ? (
+                  <p className="mt-4 text-sm">
+                    <Link href={`/column/${guides[c.id]!.slug}`} className="link inline-flex items-center gap-1.5">
+                      コラム：{guides[c.id]!.title}
+                      <ArrowIcon />
+                    </Link>
+                  </p>
+                ) : null}
               </div>
               <div data-reveal>
                 <h3 className="text-base">使える{c.name}</h3>
@@ -260,6 +274,7 @@ export default function SewingMachinePage() {
               ]}
             />
           </div>
+          <ClusterColumns parent="/sewing-machine" title="ミシンのコラム" exclude={linked} more={{ href: "/column/category/machine", label: "ミシンのコラム一覧" }} />
         </Container>
       </section>
 

@@ -6,6 +6,8 @@ category: sewing
 type: guide
 order: 8
 tags: [洋裁, 裁断, 作業台, 裁断台, 日暮里 洋裁]
+keyword: 洋裁 裁断台 メリット
+parent: /handmade
 cover: spaceLargeTable
 cta:
   href: /equipment#cutting-table

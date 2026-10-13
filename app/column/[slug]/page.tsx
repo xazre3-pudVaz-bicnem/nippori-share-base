@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,6 +20,15 @@ import { ReserveCta } from "@/components/sections/ReserveCta";
 
 type Props = { params: Promise<{ slug: string }> };
 
+/**
+ * SNS で共有されたときの画像。記事の写真を横長（1200×630）に切り出したもの（public/og/photo/<写真の名前>.jpg。
+ * npm run og:photos で作る）。まだ作っていない写真の記事は、共通の画像になる。
+ */
+function shareImage(coverKey: string, alt: string) {
+  const file = `/og/photo/${coverKey}.jpg`;
+  return fs.existsSync(path.join(process.cwd(), "public", file)) ? { path: file, width: 1200, height: 630, alt } : undefined;
+}
+
 export const dynamicParams = false;
 
 export function generateStaticParams() {
@@ -30,6 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!column) return {};
   // 記事タイトルが長いとき、またはタイトルに店名が入っているときは「｜Nippori Share Base」を付けない
   const width = [...column.title].reduce((a, ch) => a + (ch.charCodeAt(0) > 255 ? 1 : 0.5), 0);
+  const cover = coverOf(column.cover);
   return buildMetadata({
     title: column.title,
     rawTitle: width > 24 || column.title.includes(SITE.name),
@@ -37,12 +49,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     path: `/column/${column.slug}`,
     type: "article",
     og: "column",
+    // SNS で共有されたときの画像は、その記事の写真（記事ごとに変わる）。無ければ共通の画像（og: "column"）
+    image: shareImage(column.cover in IMG ? column.cover : "spaceMain", cover.alt),
     // 公開日・更新日は記事ファイルの値をそのまま使う（更新していない記事は公開日と同じ）
     publishedTime: column.date,
     modifiedTime: column.updated ?? column.date,
     section: COLUMN_CATEGORIES[column.category].label,
     tags: column.tags,
-    keywords: column.tags,
+    keywords: column.keyword ? [column.keyword, ...column.tags.filter((t) => t !== column.keyword)] : column.tags,
   });
 }
 
@@ -69,6 +83,7 @@ export default async function ColumnPage({ params }: Props) {
             datePublished: column.date,
             dateModified: column.updated,
             section: category.label,
+            keywords: column.tags,
           }),
         }}
       />

@@ -27,6 +27,9 @@ export function absoluteUrl(path = "/"): string | undefined {
 
 export const SITE_TITLE_SUFFIX = `｜${SITE.name}`;
 
+/** 新着コラムの RSS */
+export const FEED_PATH = "/feed.xml";
+
 /** SNS 共有用の画像（public/og/*.jpg）。無指定は default */
 export type OgKey = "default" | "space" | "sewing-machine" | "handmade" | "workshop" | "column";
 
@@ -40,6 +43,8 @@ type BuildMetadataInput = {
   keywords?: string[];
   type?: "website" | "article";
   og?: OgKey;
+  /** SNS 共有用の画像を個別に指定する（コラムの記事の写真など）。指定すると og より優先される */
+  image?: { path: string; width: number; height: number; alt?: string };
   publishedTime?: string;
   modifiedTime?: string;
   section?: string;
@@ -53,14 +58,18 @@ type BuildMetadataInput = {
 export function buildMetadata(input: BuildMetadataInput): Metadata {
   const title = input.rawTitle ? input.title : `${input.title}${SITE_TITLE_SUFFIX}`;
   const url = absoluteUrl(input.path);
-  const ogImage = absoluteUrl(`/og/${input.og ?? "default"}.jpg`);
+  const ogImage = absoluteUrl(input.image?.path ?? `/og/${input.og ?? "default"}.jpg`);
+  const ogSize = input.image ? { width: input.image.width, height: input.image.height } : { width: 1200, height: 630 };
+  const ogAlt = input.image?.alt ?? `${input.title}｜${SITE.name}`;
+  const feed = absoluteUrl(FEED_PATH);
   const noindex = input.noindex || !IS_PUBLIC;
 
   return {
     title,
     description: input.description,
     keywords: input.keywords,
-    alternates: url ? { canonical: url } : undefined,
+    // canonical は自分自身。あわせて、新着コラムの RSS（/feed.xml）の場所を知らせる
+    alternates: url ? { canonical: url, ...(feed ? { types: { "application/rss+xml": [{ url: feed, title: `${SITE.name} コラム・お知らせ` }] } } : {}) } : undefined,
     // 本番URL未設定（プレビュー）は noindex,nofollow。意図的な noindex ページは follow を残す
     robots: noindex
       ? { index: false, follow: IS_PUBLIC }
@@ -72,7 +81,7 @@ export function buildMetadata(input: BuildMetadataInput): Metadata {
       locale: "ja_JP",
       type: input.type ?? "website",
       url,
-      ...(ogImage ? { images: [{ url: ogImage, width: 1200, height: 630, alt: `${input.title}｜${SITE.name}` }] } : {}),
+      ...(ogImage ? { images: [{ url: ogImage, ...ogSize, alt: ogAlt }] } : {}),
       ...(input.type === "article"
         ? { publishedTime: input.publishedTime, modifiedTime: input.modifiedTime, section: input.section, tags: input.tags }
         : {}),

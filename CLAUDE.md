@@ -26,7 +26,8 @@ README の「ページと、担当する検索意図」の表が正。要点：
 - `/sewing-machine`＝日暮里でミシンが使える場所。「レンタルミシン」は**スペース内で使う**意味で、持ち帰りではないと冒頭に書く
 - 機種ごとの説明は `/equipment`。`/sewing-machine` は機種名からリンクするだけ
 - `/handmade` はミシンの種類を説明しない。`/space` は洋裁の進め方を説明しない
-- コラムは「知りたい」に答える。来店目的の検索語は固定ページの担当（`docs/column-backlog.md`）
+- コラムは「知りたい」に答える。来店目的の検索語は固定ページの担当。担当の一覧は `lib/keywords.ts`
+- コラムは親になる固定ページごとにまとめる（frontmatter の `parent`）。固定ページの「このテーマのコラム」に自動で並ぶ
 
 ## 単一ソース（ページに直接書かない）
 
@@ -41,6 +42,8 @@ README の「ページと、担当する検索意図」の表が正。要点：
 | FAQ | `data/faqs.ts` |
 | 規約 | `data/terms.ts`（公式の原文。要約・加筆しない） |
 | 写真と alt | `data/images.ts`（alt は写っているものだけ。検索語を入れない） |
+| ページごとの担当キーワード | `lib/keywords.ts` |
+| コラムの自動生成のテーマ | `data/blog-topics.json`（`data/site-facts.json` は自動で作られる。手で直さない） |
 
 NAP 表記は「Nippori Share Base／〒116-0014 東京都荒川区東日暮里4-33-3 齊藤商店2F／03-3803-4007（齊藤商店）」で統一。
 
@@ -50,6 +53,9 @@ NAP 表記は「Nippori Share Base／〒116-0014 東京都荒川区東日暮里4
   `ReserveCta` の `variant` をページの内容で選ぶ。全ページに同じものを機械的に出さない
 - 料金は税込を主に表示する。税抜だけを大きく出さない。金額の数字をページに直接書かない
 - コラムの `date` は実際の公開日、`updated` は実際に直した日。検索のために日付を変えない
+- コラムの自動投稿（`docs/daily-blog.md`）：自動で書くのは guide・local だけ。できごと（report）と機種ごとの記事は人が書く。
+  検査（`scripts/lib/column-quality.mjs`）をゆるめて本数を増やさない。「毎日かならず公開」にしない
+- 自動生成に渡す店の事実は、`lib/site.ts`・`data/*.ts` から作る（`scripts/lib/site-facts.mjs`）。スクリプトに料金や機種を書き写さない
 - FAQPage の構造化データは `/faq` だけ。他ページは `pickFaqs()` で表示のみ。Review / AggregateRating / openingHours は出さない
 - 回答・本文はアコーディオンで隠さない
 - 枠と影で囲むカードを増やさない。区切りは破線（`.rows`）・余白・写真で。絵文字とアイコンの多用は禁止

@@ -6,6 +6,8 @@ category: workshop
 type: guide
 order: 7
 tags: [ワークショップ 会場, ワークショップ 開催, 日暮里 ワークショップ, ハンドメイド イベント]
+keyword: ワークショップ 会場 選び方
+parent: /workshop
 cover: layoutSeminar
 cta:
   href: /workshop

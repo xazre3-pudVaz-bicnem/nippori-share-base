@@ -11,7 +11,7 @@
  * a はプレーンテキスト。構造化データにも同じ文字列を使うので、画面と一致する。
  * 金額は data/pricing.ts から、住所・アクセス・支払い方法は lib/site.ts から作る（ここに直接書かない）。
  */
-import { CLUB, CUTTING_MACHINE, LASER, MACHINE_PLANS, MENTOR, planPriceText, priceText, yen } from "@/data/pricing";
+import { CLUB, CUTTING_MACHINE, LASER, MACHINE_PLANS, MENTOR, laserPriceText, planPriceText, priceText, yen } from "@/data/pricing";
 import { SITE, walkText } from "@/lib/site";
 
 const general = MACHINE_PLANS.rows[0].ex;
@@ -151,7 +151,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "laser",
         q: "レーザー加工機は自分で使えますか？",
-        a: `レーザー加工機（${LASER.machine}）は、ご自身で操作する体験ではなく、オーダーで加工を承る形です。加工できる素材は${LASER.materials.join("・")}です。そのほかの素材は機械の調整が必要なため、要相談のうえ試作の時間をいただきます。料金は、材料費＋レーザー加工時間1分につき${yen(LASER.perMinute)}円＋加工手数料${yen(LASER.feePerData)}円（1データにつき）です。スペースにある材料も含めて、まずはご相談ください。`,
+        a: `レーザー加工機（${LASER.machine}）は、ご自身で操作する体験ではなく、オーダーで加工を承る形です。加工できる素材は${LASER.materials.join("・")}です。そのほかの素材は機械の調整が必要なため、要相談のうえ試作の時間をいただきます。料金は、${laserPriceText}です。スペースにある材料も含めて、まずはご相談ください。`,
         link: { href: "/equipment#laser", label: "レーザー加工について" },
       },
       {
@@ -230,7 +230,7 @@ export const FAQ_GROUPS: FaqGroup[] = [
       {
         id: "contact",
         q: "問い合わせはどこにすればいいですか？",
-        a: `メール（${SITE.email}）またはお電話（${SITE.tel}・齊藤商店）でお問い合わせください。Instagram（${SITE.instagramHandle}）でもイベントやお知らせを発信しています。`,
+        a: `メール（${SITE.email}）またはお電話（${SITE.tel}）でお問い合わせください。お電話は1階の齊藤商店につながります（齊藤商店の営業は${SITE.telUntil}までです）。Instagram（${SITE.instagramHandle}）でもイベントやお知らせを発信しています。`,
       },
     ],
   },

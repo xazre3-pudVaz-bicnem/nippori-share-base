@@ -6,6 +6,8 @@ category: textile-town
 type: local
 order: 3
 tags: [日暮里繊維街, 日暮里 生地, 日暮里 ミシン, 水通し, 裁断]
+keyword: 日暮里繊維街 生地 買ったあと
+parent: /access
 cover: exterior
 cta:
   href: /sewing-machine

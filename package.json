@@ -10,7 +10,10 @@
     "typecheck": "tsc --noEmit",
     "images:prepare": "node scripts/prepare-images.mjs",
     "fonts:fetch": "node scripts/fetch-fonts.mjs",
-    "og:make": "node scripts/make-og.mjs"
+    "og:make": "node scripts/make-og.mjs",
+    "og:photos": "node scripts/make-og-photos.mjs",
+    "facts:build": "node scripts/build-site-facts.mjs",
+    "blog:generate": "node scripts/generate-daily-blog.mjs"
   },
   "dependencies": {
     "budoux": "^0.9.3",
@@ -22,6 +25,7 @@
     "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.131.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

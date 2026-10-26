@@ -21,7 +21,7 @@ GitHub のリポジトリ → Settings → Secrets and variables → Actions。
 | 種類 | 名前 | 必須 | 内容 |
 | --- | --- | --- | --- |
 | Secret | `ANTHROPIC_API_KEY` | ○ | Claude API のキー（https://console.anthropic.com で発行。利用分だけ課金されます） |
-| Variable | `ANTHROPIC_MODEL` |  | 使うモデル。無ければ `claude-haiku-4-5-20251001`（費用を抑える Haiku）。文章の質を上げたいときは `claude-sonnet-5-5` など |
+| Variable | `ANTHROPIC_MODEL` |  | 使うモデル。無ければ `claude-haiku-5-5`（費用を抑える Haiku の現行世代）。文章の質を上げたいときは `claude-sonnet-5-5` |
 | Variable | `ANTHROPIC_REVIEW_MODEL` |  | 校閲だけ別のモデルにしたいとき |
 | Variable | `DAILY_BLOG_MODE` |  | `draft` にすると、公開せず下書き（`draft: true`）として保存します。人が読んでから公開したいとき |
 | Variable | `GIT_AUTHOR_NAME` / `GIT_AUTHOR_EMAIL` |  | commit の作者。無ければ `github-actions[bot]` |

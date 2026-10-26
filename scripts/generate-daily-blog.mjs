@@ -25,12 +25,15 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { bigrams, checkArticle, headings, jaccard, keywordTokens, shingles, skeleton, squash } from "./lib/column-quality.mjs";
+import { bigrams, checkArticle, headings, jaccard, keywordTokens, shingles, skeleton, squash, trimFixedLinks } from "./lib/column-quality.mjs";
 import { loadSite } from "./lib/load-site.mjs";
 import { buildSiteFacts, knownAmounts, knownModelCodes } from "./lib/site-facts.mjs";
 
-/** 既定のモデル（費用を抑える Haiku）。文章の質を上げたいときは ANTHROPIC_MODEL に Sonnet などを指定する */
-const DEFAULT_MODEL = "claude-haiku-4-5-20251001";
+/**
+ * 既定のモデル（費用を抑える Haiku の現行世代、Claude Haiku 5.5）。文章の質を上げたいときは ANTHROPIC_MODEL に Sonnet（claude-sonnet-5-5）などを指定する。
+ * Haiku 5.5 は考える処理（thinking）が標準で動き、その分も出力の上限（max_tokens）に含まれるので、上限は大きめにしている
+ */
+const DEFAULT_MODEL = "claude-haiku-5-5";
 
 const ROOT = process.cwd();
 const COLUMN_DIR = path.join(ROOT, "content", "column");
@@ -433,7 +436,7 @@ async function createCaller() {
   const { default: Anthropic } = await import("@anthropic-ai/sdk");
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 3, timeout: 10 * 60 * 1000 });
   return async ({ kind, system, messages }) => {
-    const stream = client.messages.stream({ model: kind === "review" ? REVIEW_MODEL : MODEL, max_tokens: kind === "review" ? 3000 : 12000, system, messages });
+    const stream = client.messages.stream({ model: kind === "review" ? REVIEW_MODEL : MODEL, max_tokens: kind === "review" ? 16000 : 32000, system, messages });
     const message = await stream.finalMessage();
     usage.calls++;
     usage.input += message.usage?.input_tokens ?? 0;
@@ -514,6 +517,9 @@ async function main() {
         report.push({ topic: topic.id, attempt, title: "", errors: [`書き手が見送りました：${draft.meta.skipReason || "理由なし"}`], warnings: [] });
         break;
       }
+
+      // 固定ページへのリンクが多すぎるときは、3 本目以降をリンクのない文字に戻す
+      draft.body = trimFixedLinks(draft.body, 2);
 
       // 写真：候補に無い・直近と同じ場合は、候補の中から入れ替える
       if (!coverCandidates.includes(draft.meta.cover) || recentCovers.includes(draft.meta.cover)) {

@@ -15,8 +15,10 @@ name: Daily column
 
 on:
   schedule:
-    # 毎日 9:00（日本時間）ごろ。GitHub の cron は UTC なので 0:00。混雑で数分〜数十分遅れることがある
-    - cron: "0 0 * * *"
+    # 毎日 8:17（日本時間）。GitHub の cron は UTC なので前日の 23:17。
+    # 毎時 0 分は GitHub が混み合い、0:00 UTC（9:00）に設定していたときは 3〜4 時間遅れて昼過ぎに動いていたため、ずらしている。
+    # それでも遅れることはある。記事の日付は日本時間の実行日になる
+    - cron: "17 23 * * *"
   workflow_dispatch:
     inputs:
       topic:

@@ -12,10 +12,11 @@
  * 流れ
  *   1. 公開済みの記事・テーマの一覧（data/blog-topics.json）・サイトの事実（lib/site.ts と data/*.ts）を読む
  *   2. 今日の分がすでにあれば何もしない
- *   3. まだ使っていないテーマから、割合がいちばん足りていない分野のものを 1 つ選ぶ
+ *   3. まだ使っていないテーマから、割合がいちばん足りていない分野のものを選ぶ（先頭の数件は日付で順番を回す）
  *   4. Claude に記事を書かせる（店について書いてよいのは、渡した事実だけ）
  *   5. 機械的な検査（scripts/lib/column-quality.mjs）と、別の呼び出しによる校閲にかける
- *   6. 通らなければ 1 回だけ書き直させる。それでも通らなければ「今日は公開しない」で終わる
+ *   6. 通らなければ、指摘を渡して書き直させる（1 テーマ 3 回まで）。それでも通らなければ次のテーマを試す（1 日 2 テーマまで）。
+ *      どれも通らなければ「今日は公開しない」で終わる
  *   7. 通った記事だけを content/column/<id>.md に書き、テーマを使用済みにする
  *
  * このスクリプトは commit も push もしない（ワークフローが、ビルドが通ったあとで行う）。
@@ -161,8 +162,12 @@ function loadColumns() {
 
 const groupOfCategory = (c) => ({ machine: "machine", "textile-town": "nippori", sewing: "sewing", handmade: "sewing", workshop: "workshop", event: "workshop" })[c] ?? "basics";
 
-/** まだ使っていないテーマから 1 つ選ぶ。割合（targetShare）に対して、いちばん足りていない分野を優先する */
-function pickTopic(topicsFile, columns) {
+/**
+ * 今日試すテーマの候補（多くて 2 つ）。割合（targetShare）に対して、いちばん足りていない分野から選ぶ。
+ * 同じ分野の中では優先度の高い順だが、先頭の数件は日付で順番を回す
+ * （うまく書けないテーマがあっても、毎日そのテーマだけを試し続けないように）。
+ */
+function pickTopics(topicsFile, columns) {
   const { topics, targetShare } = topicsFile;
   const bySlug = new Map(columns.map((c) => [c.slug, c]));
   const usedIds = new Set(columns.flatMap((c) => (c.topic ? [c.topic] : [])));
@@ -179,11 +184,11 @@ function pickTopic(topicsFile, columns) {
     const t = topics.find((x) => x.id === TOPIC_ID);
     if (!t) throw new Error(`テーマ「${TOPIC_ID}」が data/blog-topics.json にありません`);
     if (bySlug.has(t.id)) throw new Error(`テーマ「${TOPIC_ID}」の記事はすでにあります（content/column/${t.id}.md）`);
-    return t;
+    return [t];
   }
 
   const free = topics.filter(isFree);
-  if (free.length === 0) return undefined;
+  if (free.length === 0) return [];
 
   const counted = columns.filter((c) => c.category !== "news");
   const count = {};
@@ -194,9 +199,21 @@ function pickTopic(topicsFile, columns) {
   const total = counted.length + 1;
   const deficit = (g) => (targetShare[g] ?? 0) * total - (count[g] ?? 0);
   const groups = [...new Set(free.map((t) => t.group))].sort((a, b) => deficit(b) - deficit(a));
-  const inGroup = free.filter((t) => t.group === groups[0]);
-  return inGroup.sort((a, b) => a.priority - b.priority)[0];
+  const ordered = groups.flatMap((g) => {
+    const list = free.filter((t) => t.group === g).sort((a, b) => a.priority - b.priority);
+    // 先頭の 5 件（優先度の高いもの）だけ、日付で順番を回す
+    const head = list.slice(0, Math.min(5, list.length));
+    const shift = DAY_NUMBER % Math.max(1, head.length);
+    return [...head.slice(shift), ...head.slice(0, shift), ...list.slice(head.length)];
+  });
+  return ordered.slice(0, MAX_TOPICS_PER_RUN);
 }
+
+/** 1 回の実行で試すテーマの数と、1 テーマあたりの書き直しの回数 */
+const MAX_TOPICS_PER_RUN = 2;
+const MAX_ATTEMPTS = 3;
+/** 日付（日本時間）を通し番号にしたもの。テーマの順番を回すのに使う */
+const DAY_NUMBER = Math.floor(Date.parse(`${TODAY}T00:00:00Z`) / 86400000);
 
 // ───────── Claude への指示 ─────────
 const WRITER_SYSTEM = `あなたは、東京・日暮里繊維街にあるものづくりシェアスペース「Nippori Share Base」のコラムを書く編集者です。
@@ -271,9 +288,10 @@ verdict の決め方
 - "revise"：直せば公開できる。issues に、直す箇所と直し方を具体的に書く。
 - "reject"：テーマや内容そのものに問題があり、直しても公開すべきでない（既存の記事と重複、読む価値がない、事実に基づけない）。
 
-unsupported または fabricated が 1 つでもあれば、"pass" にしてはいけません。迷ったら "revise" にします。
+unsupported・fabricated・dubious・duplicate が 1 つでもあれば、"pass" にしてはいけません。迷ったら "revise" にします。
+style は、読者の理解を妨げるもの・決まり文句・不自然な繰り返しだけを挙げます。言い回しの好みの違い（「こんな」と「次のような」など）は挙げません。
 
-次の形だけを出力します。前後に説明を付けません。
+次の形だけを出力します。前後に説明を付けず、コードブロック（\`\`\`）も使わず、<review> と </review> で囲みます。
 
 <review>
 {"verdict":"pass または revise または reject","scores":{"factual":0,"value":0,"originality":0,"style":0},"issues":[],"summary":"一言で"}
@@ -287,13 +305,14 @@ function buildContext({ topic, facts, columns, coverCandidates, recentCovers }) 
   const published = columns.filter((c) => !c.draft && c.date <= TODAY);
   // 既存の記事：すべてのタイトルと検索意図。見出しは、テーマが近い 20 本だけ（記事が増えても入力が膨らみすぎないように）
   const mine = keywordTokens(`${topic.targetKeyword} ${topic.titleIdea}`);
-  const near = new Set(
-    [...columns]
-      .map((c) => ({ c, s: jaccard(mine, keywordTokens(`${c.keyword} ${c.title}`)) + (c.parent === topic.parentPage ? 0.2 : 0) + (c.category === topic.category ? 0.1 : 0) }))
-      .sort((a, b) => b.s - a.s)
-      .slice(0, 20)
-      .map((x) => x.c.slug),
-  );
+  const ranked = published
+    .filter((c) => c.category !== "news")
+    .map((c) => ({ c, s: jaccard(mine, keywordTokens(`${c.keyword} ${c.title}`)) + (c.parent === topic.parentPage ? 0.2 : 0) + (c.category === topic.category ? 0.1 : 0) }))
+    .sort((a, b) => b.s - a.s)
+    .map((x) => x.c);
+  const near = new Set(ranked.slice(0, 20).map((c) => c.slug));
+  // 本文からリンクする記事の候補（テーマの近い順）。ここから 2〜3 本を選ばせる
+  const linkCandidates = ranked.slice(0, 6).map((c) => `- /column/${c.slug} ｜ ${c.title}`).join("\n");
   const existing = published
     .map((c) => `- /column/${c.slug} ｜ ${c.title} ｜ 検索意図：${c.keyword || "（未設定）"}${near.has(c.slug) ? ` ｜ 見出し：${c.headings.join(" / ")}` : ""}`)
     .join("\n");
@@ -317,9 +336,11 @@ ${JSON.stringify(facts, null, 1)}
 </facts>
 
 <links>
-固定ページ（リンクしてよい URL）
+固定ページ（リンクしてよい URL。本文中で 1〜2 本だけ使う。3 本以上にしない）
 ${PAGE_LINKS.map(([href, label]) => `- ${href} ｜ ${label}`).join("\n")}
-既存の記事は <existing> の URL を使う
+
+テーマの近い既存の記事（この中から 2〜3 本を選び、本文の流れの中でリンクする。必須）
+${linkCandidates || "（まだありません）"}
 </links>
 
 <existing>
@@ -335,35 +356,64 @@ ${photos}
 </photos>`;
 }
 
-function parseDraft(text) {
-  const meta = text.match(/<meta>\s*([\s\S]*?)\s*<\/meta>/);
-  if (!meta) throw new Error("出力に <meta> がありません");
-  let json;
-  try {
-    json = JSON.parse(meta[1].replace(/^```(?:json)?\s*|\s*```$/g, ""));
-  } catch (e) {
-    throw new Error(`<meta> の JSON を読めません：${e.message}`);
+/**
+ * 出力の中から JSON を取り出す。決めた形（<tag>…</tag>）を基本にしつつ、
+ * モデルによってはコードブロック（```json）だけで返すことがあるので、その形も読む。
+ */
+function extractJson(text, tag) {
+  const tagged = text.match(new RegExp(`<${tag}>\\s*([\\s\\S]*?)\\s*</${tag}>`));
+  let src = tagged ? tagged[1] : undefined;
+  if (src === undefined) {
+    const fenced = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+    if (fenced) src = fenced[1];
   }
+  if (src === undefined) {
+    const start = text.indexOf("{");
+    const end = text.lastIndexOf("}");
+    if (start >= 0 && end > start) src = text.slice(start, end + 1);
+  }
+  if (src === undefined) throw new Error(`出力に <${tag}> がありません`);
+  src = src.replace(/^```(?:json)?\s*|\s*```$/g, "").trim();
+  try {
+    return JSON.parse(src);
+  } catch (e) {
+    throw new Error(`<${tag}> の JSON を読めません：${e.message}`);
+  }
+}
+
+function parseDraft(text) {
+  const json = extractJson(text.split(/<article>/)[0], "meta");
   if (json.decision === "skip") return { meta: json, body: "" };
-  const article = text.match(/<article>\s*([\s\S]*?)\s*<\/article>/);
-  if (!article) throw new Error("出力に <article> がありません");
+  const article = text.match(/<article>\s*([\s\S]*?)\s*(?:<\/article>|$)/);
+  if (!article || !article[1].trim()) throw new Error("出力に <article> がありません");
   return { meta: json, body: article[1].replace(/\r\n/g, "\n").trim() };
 }
 
 function parseReview(text) {
-  const m = text.match(/<review>\s*([\s\S]*?)\s*<\/review>/);
-  if (!m) throw new Error("校閲の出力に <review> がありません");
-  const r = JSON.parse(m[1].replace(/^```(?:json)?\s*|\s*```$/g, ""));
+  const r = extractJson(text, "review");
   r.issues = Array.isArray(r.issues) ? r.issues : [];
   r.scores = r.scores ?? {};
   return r;
 }
 
-/** 校閲の結果から、公開してよいかを決める（校閲者が pass と言っても、点が低ければ通さない） */
-function reviewPasses(r) {
-  const blocking = r.issues.some((i) => i.type === "unsupported" || i.type === "fabricated" || i.type === "duplicate");
+/** 公開を止める指摘（事実・架空・誤り・重複）。文章の指摘（style）と価値の指摘（value）は、書き直しには使うが、点数で判断する */
+const BLOCKING = ["unsupported", "fabricated", "dubious", "duplicate"];
+
+/**
+ * 校閲の結果から、公開してよいかを決める。
+ * - 事実・架空・誤り・重複の指摘が 1 つでもあれば、公開しない
+ * - 点数（事実 4・価値 4・独自性 3・文章 3 以上）に届かなければ、公開しない
+ * - 校閲者が pass と言えば公開。revise でも、残っている指摘が文章の言い回し（style）だけなら、最後の書き直しのあとに限り公開する
+ *   （言い回しの好みで、事実に問題のない記事を毎日止め続けないように）
+ */
+function reviewPasses(r, { lastAttempt }) {
+  if (r.verdict === "reject") return false;
+  if (r.issues.some((i) => BLOCKING.includes(i.type))) return false;
   const s = r.scores;
-  return r.verdict === "pass" && !blocking && (s.factual ?? 0) >= 4 && (s.value ?? 0) >= 4 && (s.originality ?? 0) >= 3 && (s.style ?? 0) >= 3;
+  const scoresOk = (s.factual ?? 0) >= 4 && (s.value ?? 0) >= 4 && (s.originality ?? 0) >= 3 && (s.style ?? 0) >= 3;
+  if (!scoresOk) return false;
+  if (r.verdict === "pass") return true;
+  return lastAttempt && r.verdict === "revise" && r.issues.every((i) => i.type === "style");
 }
 
 // ───────── Claude の呼び出し ─────────
@@ -417,15 +467,11 @@ async function main() {
   const photoKeys = new Set(facts.photos.map((p) => p.key));
   for (const key of Object.values(COVER_POOL).flat()) if (!photoKeys.has(key)) throw new Error(`COVER_POOL の ${key} は data/images.ts にありません`);
 
-  const topic = pickTopic(topicsFile, columns);
-  if (!topic) return finish({ published: false, reason: "使えるテーマが残っていません（data/blog-topics.json にテーマを足してください）" });
-  log(`[daily-blog] テーマ：${topic.id}（${topic.targetKeyword}）`);
+  const candidates = pickTopics(topicsFile, columns);
+  if (candidates.length === 0) return finish({ published: false, reason: "使えるテーマが残っていません（data/blog-topics.json にテーマを足してください）" });
 
   const recentCovers = columns.slice(0, 3).map((c) => c.cover);
-  const coverCandidates = COVER_POOL[topic.category] ?? COVER_POOL.handmade;
-  const context = buildContext({ topic, facts, columns, coverCandidates, recentCovers });
-  const checkInput = {
-    topic,
+  const baseCheck = {
     existing: columns,
     recentAuto: columns.slice(0, 5),
     amounts: knownAmounts(facts),
@@ -436,78 +482,94 @@ async function main() {
   };
 
   const call = await createCaller();
-  const writerMessages = [{ role: "user", content: context }];
   const report = [];
   let accepted;
 
-  // 1 回書かせて、通らなければ 1 回だけ書き直させる
-  for (let attempt = 1; attempt <= 2 && !accepted; attempt++) {
-    const raw = await call({ kind: "draft", system: WRITER_SYSTEM, messages: writerMessages });
-    saveWork(`draft-${attempt}.txt`, raw);
-    let draft;
-    try {
-      draft = parseDraft(raw);
-    } catch (error) {
-      // 出力の形が崩れていた場合も、1 回だけやり直させる（エラーで止めない）
-      log(`[daily-blog] ${attempt} 回目：出力を読めません（${error.message}）`);
-      report.push({ attempt, title: "", errors: [`出力の形式を読めませんでした：${error.message}`], warnings: [] });
-      writerMessages.push({ role: "assistant", content: raw }, { role: "user", content: `出力の形式を読み取れませんでした（${error.message}）。<meta> の中は 1 行の正しい JSON にして、<meta>…</meta> と <article>…</article> の形だけで、もう一度すべて出力してください。` });
-      continue;
-    }
-    if (draft.meta.decision === "skip") return finish({ published: false, reason: `書き手が見送りました：${draft.meta.skipReason || "理由なし"}`, detail: `テーマ：\`${topic.id}\`` });
+  // テーマを 1 つずつ試す（多くて MAX_TOPICS_PER_RUN）。1 テーマにつき、書かせて点検し、通らなければ指摘を渡して書き直させる（多くて MAX_ATTEMPTS 回）
+  for (const [ti, topic] of candidates.entries()) {
+    if (accepted) break;
+    log(`[daily-blog] テーマ：${topic.id}（${topic.targetKeyword}）`);
+    const coverCandidates = COVER_POOL[topic.category] ?? COVER_POOL.handmade;
+    const context = buildContext({ topic, facts, columns, coverCandidates, recentCovers });
+    const checkInput = { ...baseCheck, topic };
+    const writerMessages = [{ role: "user", content: context }];
+    const tag = `t${ti + 1}`;
 
-    // 写真：候補に無い・直近と同じ場合は、候補の中から入れ替える
-    if (!coverCandidates.includes(draft.meta.cover) || recentCovers.includes(draft.meta.cover)) {
-      draft.meta.cover = coverCandidates.find((k) => !recentCovers.includes(k)) ?? coverCandidates[0];
-    }
-
-    const checked = checkArticle({ ...checkInput, meta: draft.meta, body: draft.body });
-    log(`[daily-blog] ${attempt} 回目：${checked.stats.chars} 字・大見出し ${checked.stats.h2} 個・リンク 固定 ${checked.stats.links.fixed}／記事 ${checked.stats.links.columns}・機械検査の不合格 ${checked.errors.length} 件`);
-
-    let review;
-    if (checked.errors.length === 0) {
-      const reviewRaw = await call({
-        kind: "review",
-        system: REVIEWER_SYSTEM,
-        messages: [{ role: "user", content: `${context}\n\n<draft>\nタイトル：${draft.meta.title}\n説明文：${draft.meta.description}\n\n${draft.body}\n</draft>` }],
-      });
-      saveWork(`review-${attempt}.txt`, reviewRaw);
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const lastAttempt = attempt === MAX_ATTEMPTS;
+      const raw = await call({ kind: "draft", system: WRITER_SYSTEM, messages: writerMessages });
+      saveWork(`${tag}-draft-${attempt}.txt`, raw);
+      let draft;
       try {
-        review = parseReview(reviewRaw);
+        draft = parseDraft(raw);
       } catch (error) {
-        // 校閲の結果を読めないときは、合格にしない
-        review = { verdict: "revise", scores: {}, issues: [], summary: `校閲の出力を読めませんでした（${error.message}）` };
+        // 出力の形が崩れていた場合も、やり直させる（エラーで止めない）
+        log(`[daily-blog] ${attempt} 回目：出力を読めません（${error.message}）`);
+        report.push({ topic: topic.id, attempt, title: "", errors: [`出力の形式を読めませんでした：${error.message}`], warnings: [] });
+        writerMessages.push({ role: "assistant", content: raw }, { role: "user", content: `出力の形式を読み取れませんでした（${error.message}）。<meta> の中は 1 行の正しい JSON にして、<meta>…</meta> と <article>…</article> の形だけで、もう一度すべて出力してください。` });
+        continue;
       }
-      log(`[daily-blog] 校閲：${review.verdict}  ${JSON.stringify(review.scores)}  指摘 ${review.issues.length} 件`);
+      if (draft.meta.decision === "skip") {
+        log(`[daily-blog] 書き手が見送りました：${draft.meta.skipReason || "理由なし"}`);
+        report.push({ topic: topic.id, attempt, title: "", errors: [`書き手が見送りました：${draft.meta.skipReason || "理由なし"}`], warnings: [] });
+        break;
+      }
+
+      // 写真：候補に無い・直近と同じ場合は、候補の中から入れ替える
+      if (!coverCandidates.includes(draft.meta.cover) || recentCovers.includes(draft.meta.cover)) {
+        draft.meta.cover = coverCandidates.find((k) => !recentCovers.includes(k)) ?? coverCandidates[0];
+      }
+
+      const checked = checkArticle({ ...checkInput, meta: draft.meta, body: draft.body });
+      log(`[daily-blog] ${attempt} 回目：${checked.stats.chars} 字・大見出し ${checked.stats.h2} 個・リンク 固定 ${checked.stats.links.fixed}／記事 ${checked.stats.links.columns}・機械検査の不合格 ${checked.errors.length} 件`);
+
+      let review;
+      if (checked.errors.length === 0) {
+        const reviewRaw = await call({
+          kind: "review",
+          system: REVIEWER_SYSTEM,
+          messages: [{ role: "user", content: `${context}\n\n<draft>\nタイトル：${draft.meta.title}\n説明文：${draft.meta.description}\n\n${draft.body}\n</draft>` }],
+        });
+        saveWork(`${tag}-review-${attempt}.txt`, reviewRaw);
+        try {
+          review = parseReview(reviewRaw);
+        } catch (error) {
+          // 校閲の結果を読めないときは、合格にしない
+          review = { verdict: "revise", scores: {}, issues: [], summary: `校閲の出力を読めませんでした（${error.message}）` };
+        }
+        log(`[daily-blog] 校閲：${review.verdict}  ${JSON.stringify(review.scores)}  指摘 ${review.issues.length} 件（${review.issues.map((i) => i.type).join("・") || "なし"}）`);
+      }
+
+      report.push({ topic: topic.id, attempt, title: draft.meta.title, errors: checked.errors, warnings: checked.warnings, review });
+
+      if (checked.errors.length === 0 && review && reviewPasses(review, { lastAttempt })) {
+        accepted = { ...draft, topic, review, stats: checked.stats };
+        break;
+      }
+      if (review?.verdict === "reject") break;
+      if (lastAttempt) break;
+
+      // 書き直しの指示（機械的な検査の不合格と、校閲の指摘をそのまま渡す）
+      const fixes = [
+        ...checked.errors.map((e) => `- ${e}`),
+        ...(review?.issues ?? []).map((i) => `- （${i.type}）${i.quote ? `「${i.quote}」→ ` : ""}${i.fix ?? ""}`),
+        ...(review && checked.errors.length === 0 && review.issues.length === 0 ? [`- 校閲の評価が基準に届いていません（${JSON.stringify(review.scores)}）。${review.summary ?? ""}`] : []),
+      ];
+      writerMessages.push({ role: "assistant", content: raw }, { role: "user", content: `公開前の点検で、次の指摘がありました。すべて直した完全な記事を、同じ形式（<meta> と <article>）でもう一度出力してください。指摘されていない部分も、同じ問題がないか見直してください。事実の一覧で裏づけられない文は、言い換えるのではなく削ってください。直せない場合は decision を "skip" にしてください。\n\n${fixes.join("\n")}` });
     }
-
-    report.push({ attempt, title: draft.meta.title, errors: checked.errors, warnings: checked.warnings, review });
-
-    if (checked.errors.length === 0 && review && reviewPasses(review)) {
-      accepted = { ...draft, review, stats: checked.stats };
-      break;
-    }
-    if (review?.verdict === "reject") break;
-
-    // 書き直しの指示
-    const fixes = [
-      ...checked.errors.map((e) => `- ${e}`),
-      ...(review?.issues ?? []).map((i) => `- （${i.type}）${i.quote ? `「${i.quote}」→ ` : ""}${i.fix ?? ""}`),
-      ...(review && checked.errors.length === 0 && review.issues.length === 0 ? [`- 校閲の評価が基準に届いていません（${JSON.stringify(review.scores)}）。${review.summary ?? ""}`] : []),
-    ];
-    writerMessages.push({ role: "assistant", content: raw }, { role: "user", content: `公開前の点検で、次の指摘がありました。すべて直した完全な記事を、同じ形式（<meta> と <article>）でもう一度出力してください。指摘されていない部分も、同じ問題がないか見直してください。直せない場合は decision を "skip" にしてください。\n\n${fixes.join("\n")}` });
   }
 
   const detail = report
     .map((r) => {
-      const lines = [`### ${r.attempt} 回目：${r.title ?? ""}`];
+      const lines = [`### ${r.topic}・${r.attempt} 回目：${r.title ?? ""}`];
       if (r.errors.length) lines.push("機械的な検査の不合格", ...r.errors.map((e) => `- ${e}`));
       if (r.review) lines.push(`校閲：**${r.review.verdict}** ${JSON.stringify(r.review.scores)} ${r.review.summary ?? ""}`, ...r.review.issues.map((i) => `- （${i.type}）${i.quote ?? ""} → ${i.fix ?? ""}`));
       return lines.join("\n");
     })
     .join("\n\n");
 
-  if (!accepted) return finish({ published: false, reason: "品質の基準を満たす記事になりませんでした", detail: `テーマ：\`${topic.id}\`（次回は同じテーマからやり直します）\n\n${detail}` });
+  if (!accepted) return finish({ published: false, reason: "品質の基準を満たす記事になりませんでした", detail: `試したテーマ：${candidates.map((t) => `\`${t.id}\``).join("、")}（明日は別のテーマから試します）\n\n${detail}` });
+  const topic = accepted.topic;
 
   // ───────── 書き出し ─────────
   const data = {

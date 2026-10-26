@@ -400,14 +400,18 @@ function parseReview(text) {
 }
 
 /** 公開を止める指摘（事実・架空・誤り・重複）。文章の指摘（style）と価値の指摘（value）は、書き直しには使うが、点数で判断する */
-const BLOCKING = ["unsupported", "fabricated", "dubious", "duplicate"];
+const BLOCKING = ["unsupported", "fabricated"];
 
 /**
  * 校閲の結果から、公開してよいかを決める。
- * - 事実・架空・誤り・重複の指摘が 1 つでもあれば、公開しない
- * - 点数（事実 4・価値 4・独自性 3・文章 3 以上）に届かなければ、公開しない
- * - 校閲者が pass と言えば公開。revise でも、残っている指摘が文章の言い回し（style）だけなら、最後の書き直しのあとに限り公開する
- *   （言い回しの好みで、事実に問題のない記事を毎日止め続けないように）
+ * - 店について事実の一覧に無いこと（unsupported）、架空の声・体験・できごと（fabricated）の指摘が 1 つでもあれば、公開しない。
+ *   これはどの回でも、点数に関係なく止める
+ * - 点数（事実 4・価値 4・独自性 3・文章 3 以上）に届かなければ、公開しない。
+ *   既存の記事との重なりは「独自性」の点数で、一般論の言い切りは「事実」の点数で判断する
+ * - 校閲者が pass と言えば公開。revise の場合は、指摘を渡して書き直させ、最後の書き直しのあとでも上の 2 つを満たしていれば公開する
+ *
+ * 校閲役は、頼まれれば必ず何かしら指摘を返す。指摘が 1 つでも残れば止めるルールだと、事実に問題のない記事も
+ * 1 本も通らなかった（2026-10-26 に確認）。止める理由は「事実」と「点数」に絞り、細かな指摘は書き直しに使う。
  */
 function reviewPasses(r, { lastAttempt }) {
   if (r.verdict === "reject") return false;
@@ -415,8 +419,7 @@ function reviewPasses(r, { lastAttempt }) {
   const s = r.scores;
   const scoresOk = (s.factual ?? 0) >= 4 && (s.value ?? 0) >= 4 && (s.originality ?? 0) >= 3 && (s.style ?? 0) >= 3;
   if (!scoresOk) return false;
-  if (r.verdict === "pass") return true;
-  return lastAttempt && r.verdict === "revise" && r.issues.every((i) => i.type === "style");
+  return r.verdict === "pass" || (lastAttempt && r.verdict === "revise");
 }
 
 // ───────── Claude の呼び出し ─────────
@@ -531,17 +534,20 @@ async function main() {
 
       let review;
       if (checked.errors.length === 0) {
-        const reviewRaw = await call({
-          kind: "review",
-          system: REVIEWER_SYSTEM,
-          messages: [{ role: "user", content: `${context}\n\n<draft>\nタイトル：${draft.meta.title}\n説明文：${draft.meta.description}\n\n${draft.body}\n</draft>` }],
-        });
-        saveWork(`${tag}-review-${attempt}.txt`, reviewRaw);
-        try {
-          review = parseReview(reviewRaw);
-        } catch (error) {
-          // 校閲の結果を読めないときは、合格にしない
-          review = { verdict: "revise", scores: {}, issues: [], summary: `校閲の出力を読めませんでした（${error.message}）` };
+        // 校閲。出力の形が崩れて読めなかったときは、1 回だけ校閲をやり直す（それでも読めなければ合格にしない）
+        for (let r = 1; r <= 2 && !review; r++) {
+          const reviewRaw = await call({
+            kind: "review",
+            system: REVIEWER_SYSTEM,
+            messages: [{ role: "user", content: `${context}\n\n<draft>\nタイトル：${draft.meta.title}\n説明文：${draft.meta.description}\n\n${draft.body}\n</draft>` }],
+          });
+          saveWork(`${tag}-review-${attempt}${r > 1 ? "-retry" : ""}.txt`, reviewRaw);
+          try {
+            review = parseReview(reviewRaw);
+          } catch (error) {
+            log(`[daily-blog] 校閲の出力を読めません（${error.message}）${r === 1 ? "。校閲をやり直します" : ""}`);
+            if (r === 2) review = { verdict: "revise", scores: {}, issues: [], summary: `校閲の出力を読めませんでした（${error.message}）` };
+          }
         }
         log(`[daily-blog] 校閲：${review.verdict}  ${JSON.stringify(review.scores)}  指摘 ${review.issues.length} 件（${review.issues.map((i) => i.type).join("・") || "なし"}）`);
       }

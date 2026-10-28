@@ -280,11 +280,14 @@ const REVIEWER_SYSTEM = `あなたは、Nippori Share Base のコラムを公開
 次の観点で点検します。
 
 1. unsupported（最重要）：Nippori Share Base について、<facts> に無いことが書かれていないか（設備・機種・サービス・料金・時間・人数・できごと・スタッフ）。金額や機種名が <facts> と一致しているか。doNotWrite に触れていないか。洋裁教室であるかのように、またはミシンを持ち帰れるかのように書いていないか。
+   unsupported に入れるのは、Nippori Share Base についての記述だけです。ほかの施設や世の中一般についての言い切りは dubious に入れます。
 2. fabricated：架空の利用者の声・体験談・レビュー・開催したイベント、書き手自身が縫った・試したかのような体験が書かれていないか。
 3. dubious：一般的な知識として、明らかな誤りや、根拠なく断定している箇所がないか。メーカー・機種ごとの数値を書いていないか。
 4. duplicate：<existing> のどれかと、答えている疑問が実質同じになっていないか。
 5. value：検索した人の疑問（<topic> の検索意図）に、この記事だけで答えられているか。一般論の寄せ集めで終わっていないか。内容が薄くないか。
 6. style：決まり文句、同じ言い回しの繰り返し、検索語の不自然な繰り返し、宣伝の押しつけ、過度な箇条書き、どの記事にも使えそうな中身のない段落がないか。
+
+写真（![説明](/photo/キー) の形。キーは <photos> のもの）と、リンクの本数・リンク先が存在するかは、別の仕組みで確かめ済みです。これらは指摘しないでください（写真の説明文が写真の内容と合っていないときだけ style として指摘します）。
 
 verdict の決め方
 - "pass"：そのまま公開してよい。
@@ -412,18 +415,20 @@ const BLOCKING = ["unsupported", "fabricated"];
  *   これはどの回でも、点数に関係なく止める
  * - 点数（事実 4・価値 4・独自性 3・文章 3 以上）に届かなければ、公開しない。
  *   既存の記事との重なりは「独自性」の点数で、一般論の言い切りは「事実」の点数で判断する
- * - 校閲者が pass と言えば公開。revise の場合は、指摘を渡して書き直させ、最後の書き直しのあとでも上の 2 つを満たしていれば公開する
+ * - 上の 2 つを満たした原稿は、その回で公開する（校閲者が revise と言っていても）。満たさなければ、指摘を渡して書き直させる
  *
  * 校閲役は、頼まれれば必ず何かしら指摘を返す。指摘が 1 つでも残れば止めるルールだと、事実に問題のない記事も
  * 1 本も通らなかった（2026-10-26 に確認）。止める理由は「事実」と「点数」に絞り、細かな指摘は書き直しに使う。
+ * また、基準を満たした原稿をさらに書き直させると、書き直しで新しい問題が入って止まることがあった（2026-10-27）。
+ * そのため、基準を満たした時点で公開する。
  */
-function reviewPasses(r, { lastAttempt }) {
+function reviewPasses(r) {
   if (r.verdict === "reject") return false;
   if (r.issues.some((i) => BLOCKING.includes(i.type))) return false;
   const s = r.scores;
   const scoresOk = (s.factual ?? 0) >= 4 && (s.value ?? 0) >= 4 && (s.originality ?? 0) >= 3 && (s.style ?? 0) >= 3;
   if (!scoresOk) return false;
-  return r.verdict === "pass" || (lastAttempt && r.verdict === "revise");
+  return r.verdict === "pass" || r.verdict === "revise";
 }
 
 // ───────── Claude の呼び出し ─────────
@@ -558,7 +563,7 @@ async function main() {
 
       report.push({ topic: topic.id, attempt, title: draft.meta.title, errors: checked.errors, warnings: checked.warnings, review });
 
-      if (checked.errors.length === 0 && review && reviewPasses(review, { lastAttempt })) {
+      if (checked.errors.length === 0 && review && reviewPasses(review)) {
         accepted = { ...draft, topic, review, stats: checked.stats };
         break;
       }

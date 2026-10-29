@@ -965,7 +965,8 @@
       "targetKeyword": "洋裁教室 ソーイングスペース 違い",
       "titleIdea": "洋裁教室とソーイングスペースの違い｜自分に合うのはどちら？",
       "searchIntent": "教わる場所と、場所と道具を借りる場所の違いを知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-10-29"
     },
     {
       "id": "choosing-space-for-making",

@@ -76,12 +76,14 @@ jobs:
           node scripts/generate-daily-blog.mjs "${args[@]}"
 
       # ここで失敗したら commit しない（壊れた記事を公開しない）
+      # 型チェックはビルドのあとに行う（画像の型の定義 next-env.d.ts と .next/types は、ビルドで作られるため。
+      # 先に型チェックすると、写真の import がすべてエラーになる。2026-10-28 にこれで公開が止まった）
       - name: 検査とビルド
         if: steps.generate.outputs.published == 'true'
         run: |
           npm run lint
-          npm run typecheck
           npm run build
+          npm run typecheck
 
       - name: commit して push する
         if: steps.generate.outputs.published == 'true'

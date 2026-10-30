@@ -1245,7 +1245,8 @@
       "targetKeyword": "Tシャツ 作り方 流れ",
       "titleIdea": "Tシャツを縫う流れ｜ニットソーイング入門",
       "searchIntent": "Tシャツを自分で縫う手順と必要なミシンを知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-10-30"
     },
     {
       "id": "sewing-terms-for-beginners",

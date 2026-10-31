@@ -520,7 +520,8 @@
       "targetKeyword": "生地 用尺 計算",
       "titleIdea": "用尺の出し方｜生地幅と型紙から必要な長さを決める",
       "searchIntent": "生地を何メートル買えばよいか計算したい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-10-31"
     },
     {
       "id": "beginner-friendly-fabrics",

@@ -66,7 +66,8 @@
       "targetKeyword": "ニット ミシン 選び方",
       "titleIdea": "ニットを縫うミシンの選び方｜家庭用・ロック・カバーステッチの役割",
       "searchIntent": "ニット生地を縫うのにどのミシンが要るのか知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-01"
     },
     {
       "id": "machine-for-thick-fabric",

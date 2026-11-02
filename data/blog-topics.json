@@ -1023,7 +1023,8 @@
       "targetKeyword": "作業スペース 自宅 狭い",
       "titleIdea": "自宅が狭くても制作を続ける方法",
       "searchIntent": "狭い家で制作の場所を確保する方法を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-02"
     },
     {
       "id": "first-day-at-rental-space",

@@ -16,7 +16,7 @@ import { loadDefaultJapaneseParser } from "budoux";
 const parser = loadDefaultJapaneseParser();
 
 /** 途中で切りたくない言葉。BudouX が中で切ってしまった場合に、切れ目を取り消す */
-const KEEP = ["Nippori Share Base", "Chum's Sewing Club", "ものづくり", "やってみたい", "カバーステッチ", "ハンドメイド", "ワークショップ", "レンタルスペース", "お問い合わせ", "日暮里繊維街", "齊藤商店"];
+const KEEP = ["Nippori Share Base", "Chum's Sewing Club", "ものづくり", "やってみたい", "カバーステッチ", "ハンドメイド", "ワークショップ", "レンタルスペース", "お問い合わせ", "日暮里繊維街", "齊藤商店", "かたがみスタイル"];
 
 export function phrases(text: string): string[] {
   const parts = parser.parse(text);

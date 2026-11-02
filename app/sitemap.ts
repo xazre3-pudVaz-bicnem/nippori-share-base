@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getActiveCategories, getAllColumns, isCategoryIndexable } from "@/lib/columns";
+import { EVENTS } from "@/data/events";
+import { eventPath } from "@/lib/events";
 import { STATIC_ROUTES } from "@/lib/nav";
 import { IS_PUBLIC, absoluteUrl } from "@/lib/seo";
 import { PRICE_AS_OF } from "@/data/pricing";
@@ -10,10 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const columns = getAllColumns();
   const latest = columns[0]?.updated ?? columns[0]?.date ?? PRICE_AS_OF;
+  const eventDates = EVENTS.map((e) => e.updated ?? e.published).sort();
+  const latestEvent = eventDates[eventDates.length - 1] ?? PRICE_AS_OF;
 
   const pages: MetadataRoute.Sitemap = STATIC_ROUTES.map((r) => ({
     url: absoluteUrl(r.path)!,
-    lastModified: r.path === "/column" || r.path === "/" ? latest : PRICE_AS_OF,
+    lastModified: r.path === "/column" || r.path === "/" ? latest : r.path === "/events" ? latestEvent : PRICE_AS_OF,
     changeFrequency: r.changeFrequency,
     priority: r.priority,
   }));
@@ -33,5 +37,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }));
 
-  return [...pages, ...categoryPages, ...columnPages];
+  const eventPages: MetadataRoute.Sitemap = EVENTS.map((e) => ({
+    url: absoluteUrl(eventPath(e))!,
+    lastModified: e.updated ?? e.published,
+    changeFrequency: "weekly",
+    priority: 0.6,
+  }));
+
+  return [...pages, ...categoryPages, ...columnPages, ...eventPages];
 }

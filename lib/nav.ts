@@ -7,7 +7,7 @@
  * - ミシン・設備 … 使える道具（ミシン／設備・道具）
  * - 楽しみ方 …… 使い方別の入口（洋裁・ハンドメイド／ワークショップ・イベント）
  * - 料金／アクセス
- * - ご案内 …… 初めての方へ、よくある質問、私たちについて、コラム・お知らせ、会員
+ * - ご案内 …… 初めての方へ、よくある質問、私たちについて、コラム・お知らせ、イベントのお知らせ、会員
  * 「楽しみ方」に設備やコラムを入れない（使い方の話ではないため）。
  */
 export type NavItem = { href: string; label: string; en: string; description?: string };
@@ -25,6 +25,7 @@ const FIRST_TIME: NavItem = { href: "/first-time", label: "初めての方へ", 
 const FAQ: NavItem = { href: "/faq", label: "よくある質問", en: "FAQ", description: "予約・料金・持ち物など" };
 const ABOUT: NavItem = { href: "/about", label: "私たちについて", en: "About", description: "目指す場所と、スタッフ紹介" };
 const COLUMN: NavItem = { href: "/column", label: "コラム・お知らせ", en: "Column", description: "読みものと、スペースのできごと" };
+const EVENTS: NavItem = { href: "/events", label: "イベントのお知らせ", en: "Events", description: "参加できるワークショップ・イベント" };
 const CLUB: NavItem = { href: "/chums-sewing-club", label: "Chum's Sewing Club", en: "Membership", description: "月額会員のご案内" };
 
 /** ヘッダー（PC）に並べる順。type: "group" は、開くと中のページが出るメニュー */
@@ -34,14 +35,14 @@ export const HEADER_NAV: (NavLink | NavGroup)[] = [
   { type: "group", id: "enjoy", label: "楽しみ方", items: [HANDMADE, WORKSHOP] },
   { type: "link", item: PRICE },
   { type: "link", item: ACCESS },
-  { type: "group", id: "guide", label: "ご案内", items: [FIRST_TIME, FAQ, ABOUT, COLUMN, CLUB] },
+  { type: "group", id: "guide", label: "ご案内", items: [FIRST_TIME, FAQ, ABOUT, COLUMN, EVENTS, CLUB] },
 ];
 
 /** スマホメニューの大きい項目 */
 export const MAIN_NAV: NavItem[] = [SPACE, MACHINE, EQUIPMENT, HANDMADE, WORKSHOP, PRICE, ACCESS];
 
 /** スマホメニューの小さい項目 */
-export const SUB_NAV: NavItem[] = [FIRST_TIME, FAQ, ABOUT, COLUMN, CLUB];
+export const SUB_NAV: NavItem[] = [FIRST_TIME, FAQ, ABOUT, COLUMN, EVENTS, CLUB];
 
 /**
  * いま開いているページが、そのメニュー項目の中かどうか。
@@ -82,6 +83,7 @@ export const FOOTER_NAV: { title: string; en: string; items: { href: string; lab
     items: [
       { href: "/about", label: "私たちについて" },
       { href: "/column", label: "コラム・お知らせ" },
+      { href: "/events", label: "イベントのお知らせ" },
       { href: "/chums-sewing-club", label: "Chum's Sewing Club" },
       { href: "/terms", label: "利用規約" },
       { href: "/terms/event", label: "イベント利用規約" },
@@ -105,6 +107,7 @@ export const STATIC_ROUTES: { path: string; priority: number; changeFrequency: "
   { path: "/faq", priority: 0.7, changeFrequency: "monthly" },
   { path: "/chums-sewing-club", priority: 0.5, changeFrequency: "monthly" },
   { path: "/column", priority: 0.7, changeFrequency: "weekly" },
+  { path: "/events", priority: 0.6, changeFrequency: "weekly" },
   { path: "/terms", priority: 0.2, changeFrequency: "yearly" },
   { path: "/terms/event", priority: 0.2, changeFrequency: "yearly" },
 ];

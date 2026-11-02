@@ -67,6 +67,12 @@ export const PAGE_KEYWORDS = {
     primary: ["Nippori Share Base アクセス"],
     secondary: ["日暮里繊維街 齊藤商店", "日暮里駅 徒歩", "東日暮里", "荒川区 東日暮里"],
   },
+  // イベントごとの検索語（ブランド名など）は、各イベントのページが data/events.ts の keywords で受け持つ
+  "/events": {
+    role: "Nippori Share Base で開催するイベントに参加したい人へ（イベントごとのページへ送る）",
+    primary: ["Nippori Share Base イベント"],
+    secondary: ["日暮里繊維街 イベント"],
+  },
 } as const satisfies Record<string, PageKeywords>;
 
 export type KeywordPage = keyof typeof PAGE_KEYWORDS;

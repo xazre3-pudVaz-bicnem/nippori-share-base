@@ -9,6 +9,8 @@ import { CTA_LABEL, PRIVATE_PATH, RESERVE_PATH } from "@/lib/site";
 const PRIVATE_PAGES = ["/workshop", "/terms/event"];
 /** 出さないページ（すでに予約の画面、または読むことが目的のページ） */
 const HIDDEN_PAGES = ["/reserve", "/terms"];
+/** この下のページにも出さない（イベントの申込は外部のショップ。スペースの予約と取り違えないように） */
+const HIDDEN_PREFIXES = ["/events/"];
 
 /**
  * スマホ用の小さな固定ボタン（画面右下）。
@@ -51,7 +53,7 @@ export function MobileCta() {
     };
   }, [pathname]);
 
-  if (HIDDEN_PAGES.includes(pathname)) return null;
+  if (HIDDEN_PAGES.includes(pathname) || HIDDEN_PREFIXES.some((p) => pathname.startsWith(p))) return null;
   const isPrivate = PRIVATE_PAGES.includes(pathname);
   const show = scrolled && !nearCta;
 

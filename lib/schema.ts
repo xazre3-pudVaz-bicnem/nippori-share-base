@@ -1,4 +1,6 @@
+import type { NsbEvent } from "@/data/events";
 import { OTHER_PLANS, withTax, yen } from "@/data/pricing";
+import { dayLabel, eventPath, sessionEnd, sessionStart } from "@/lib/events";
 import { SITE } from "@/lib/site";
 import { SITE_URL, absoluteUrl } from "@/lib/seo";
 
@@ -116,6 +118,39 @@ export function websiteSchema(): Json {
     description: SITE.description,
     publisher: { "@id": id("organization") },
   };
+}
+
+/**
+ * イベント（data/events.ts）。日時と定員が回ごとに決まっているので、回ごとに 1 つの Event にする。
+ * 画面に出している情報だけを入れる（空き状況は分からないので availability は入れない）。
+ */
+export function eventSchemas(e: NsbEvent): Json[] {
+  const images = [e.img ? absoluteUrl(e.img.src.src) : undefined, e.ogImage ? absoluteUrl(e.ogImage) : undefined].filter(Boolean);
+  return e.sessions.map((s) => ({
+    "@type": "Event",
+    name: `${e.title} ${dayLabel(s.date)}${s.label}（${s.item}）`,
+    description: e.description,
+    startDate: sessionStart(s),
+    endDate: sessionEnd(s),
+    eventStatus: "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    location: { "@type": "Place", name: SITE.name, address: postalAddress },
+    image: images.length > 0 ? images : undefined,
+    url: absoluteUrl(eventPath(e)),
+    maximumAttendeeCapacity: s.capacity,
+    organizer: e.hosts.map((name) => ({ "@type": "Organization", name })),
+    // その回で作るものの参加費
+    offers: e.items
+      .filter((item) => item.name === s.item)
+      .map((item) => ({
+        "@type": "Offer",
+        name: item.name,
+        price: item.inc,
+        priceCurrency: "JPY",
+        url: e.apply.online.url,
+        validFrom: e.apply.online.opens,
+      })),
+  }));
 }
 
 export type Crumb = { name: string; path: string };

@@ -86,6 +86,7 @@ npm run typecheck
 | `/about` | 誰が、なぜ運営しているか。スタッフ紹介 | Nippori Share Base（指名検索） |
 | `/price` `/reserve` `/first-time` `/faq` `/chums-sewing-club` | ご利用案内 | 指名検索、ロングテール |
 | `/column` ほか | できごと・地域のこと・読みもの | 情報収集の検索語 |
+| `/events` `/events/◯◯` | 参加者を募集するイベントの告知（参加したい人向け。会をひらきたい主催者向けは `/workshop`） | イベント名・主催のブランド名（各イベントのページ）、Nippori Share Base イベント |
 | `/terms` `/terms/event` | 規約 | — |
 
 - 「レンタルミシン」は、**スペース内で使う**という意味で使っています。持ち帰りの貸し出しではないことを、`/sewing-machine` の冒頭と FAQ に明記しています
@@ -135,6 +136,7 @@ npm run typecheck
 | よくある質問 | `data/faqs.ts`（`/faq` と構造化データに自動反映） |
 | 規約の改定 | `data/terms.ts` |
 | コラム・お知らせを書く | `content/column/` に `.md` を 1 つ置く → 書き方は `content/column/README.md` |
+| イベントの告知（日時・参加費・申込ページ） | `data/events.ts` に 1 件足す。告知ページ（`/events/◯◯`）・一覧・トップの「イベントのお知らせ」・sitemap・構造化データ（Event）に反映。申込ページの URL は `apply.online.url`（書くまでは申込ボタンが出ません）。告知画像は原本を `photos-original/events/` に置き、`scripts/prepare-event-images.mjs` で書き出して `data/images.ts` の `EVENT_IMG` に登録 |
 | コラムの自動投稿（テーマ、設定、止め方） | `docs/daily-blog.md`、テーマは `data/blog-topics.json` |
 | ページごとの担当キーワード | `lib/keywords.ts` |
 | メニューの項目 | `lib/nav.ts`（ヘッダーの分け方：スペース／ミシン・設備／楽しみ方／料金／アクセス／ご案内） |
@@ -189,7 +191,8 @@ npm run typecheck
 ### 構造化データ
 
 `Organization`・`LocalBusiness`・`WebSite`（全ページ）、`BreadcrumbList`（下層全ページ）、`FAQPage`（`/faq` のみ。画面に出している Q&A だけ）、
-`Article`（コラム。公開日・更新日は記事ファイルの値。自動投稿でも、直していない記事の更新日は変わりません）、`AboutPage`（`/about`）、`ItemList`（`/equipment`）。
+`Article`（コラム。公開日・更新日は記事ファイルの値。自動投稿でも、直していない記事の更新日は変わりません）、`AboutPage`（`/about`）、`ItemList`（`/equipment`）、
+`Event`（イベントの告知ページ。日時と定員が回ごとに決まっているので、回ごとに 1 つ）。
 新着コラムの RSS は `/feed.xml`。
 `Review`・`AggregateRating`・`openingHours` は出していません（実在するレビューが無く、営業日は予約カレンダーに依存するため）。
 
@@ -227,7 +230,7 @@ components/layout/    Header・Footer・メニュー・スマホの固定ボタ�
 components/sections/  ページを組み立てるセクション
 components/ui/        汎用部品（写真枠・見出し・パンくず・アイコン）
 content/column/       コラム・お知らせの Markdown
-data/                 料金・機種・設備・FAQ・規約・写真の一覧・スタッフ紹介、コラムのテーマ一覧
+data/                 料金・機種・設備・FAQ・規約・写真の一覧・スタッフ紹介・イベント、コラムのテーマ一覧
 lib/                  店舗情報・SEO・構造化データ・ナビ・コラムの読み込み
 docs/                 確認済みの事実、コラムの自動投稿の手引き、修正依頼書（requests/。PDF は git に入れない）
 photos-original/      写真の原本（配信されない）

@@ -604,6 +604,14 @@
     },
     {
       "path": "/column"
+    },
+    {
+      "path": "/events",
+      "role": "Nippori Share Base で開催するイベントに参加したい人へ（イベントごとのページへ送る）",
+      "ownedKeywords": [
+        "Nippori Share Base イベント",
+        "日暮里繊維街 イベント"
+      ]
     }
   ],
   "photos": [

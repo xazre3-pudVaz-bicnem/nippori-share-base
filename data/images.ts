@@ -5,9 +5,12 @@
  *
  * alt は「写真に実際に写っているもの」だけを書く（写っていない設備や人数を足さない。検索語も入れない）。
  *
- * すべて、実際の Nippori Share Base で撮影された写真。
+ * IMG は、すべて実際の Nippori Share Base で撮影された写真。
  * 旧サイトにあった利用風景の 3 枚（ミシン・編み会・レーザーのワークショップ）は AI で生成された画像と
  * 分かったため、使っていない。実在しない場面を「利用風景」として見せないため。
+ *
+ * EVENT_IMG は、イベントの主催者からいただいた告知画像・見本の写真（掲載の許可あり）。告知ページ（/events）だけで使う。
+ * 利用風景としては使わない。コラムの自動生成と OG 画像の生成は IMG だけを読むので、ここに混ぜないこと。
  */
 import type { StaticImageData } from "next/image";
 
@@ -29,6 +32,16 @@ import workScrunchies from "@/public/images/works/scrunchies.jpg";
 import workScissorCases from "@/public/images/works/leather-scissor-cases.jpg";
 import workPincushions from "@/public/images/works/pincushions-and-coaster.jpg";
 import logo from "@/public/images/brand/logo.png";
+import maffonFlyer from "@/public/images/events/maffon-workshop-2026-11/flyer.jpg";
+import maffonTracy from "@/public/images/events/maffon-workshop-2026-11/tracy-tshirt.jpg";
+import maffonFlounder from "@/public/images/events/maffon-workshop-2026-11/flounder-skirt.jpg";
+import maffonTshirtFabric1 from "@/public/images/events/maffon-workshop-2026-11/tshirt-fabric-1.jpg";
+import maffonTshirtFabric2 from "@/public/images/events/maffon-workshop-2026-11/tshirt-fabric-2.jpg";
+import maffonTshirtFabric3 from "@/public/images/events/maffon-workshop-2026-11/tshirt-fabric-3.jpg";
+import maffonTshirtFabric4 from "@/public/images/events/maffon-workshop-2026-11/tshirt-fabric-4.jpg";
+import maffonTshirtFabric5 from "@/public/images/events/maffon-workshop-2026-11/tshirt-fabric-5.jpg";
+import maffonSkirtFabrics12 from "@/public/images/events/maffon-workshop-2026-11/skirt-fabrics-1-2.jpg";
+import maffonSkirtFabrics34 from "@/public/images/events/maffon-workshop-2026-11/skirt-fabrics-3-4.jpg";
 
 /** note … 写真について確認できている事実（alt とは別。写っているもの以外の情報。コラムの自動生成にも渡す） */
 export type Img = { src: StaticImageData; alt: string; note?: string };
@@ -104,5 +117,28 @@ export const IMG = {
     src: workPincushions,
     alt: "Nippori Share Base のロゴを彫った木の丸い板と、木の台にゴムバンドを付けたアームピンクッションが4つ。小さなミシンの置物も並んでいる",
     note: "ロゴの板とアームピンクッションの木の台は、スペースのレーザー加工機で作ったもの（2026-10-09 に運営へ確認）",
+  },
+} satisfies Record<string, Img>;
+
+/** イベントの告知画像・見本の写真（主催者から受領。scripts/prepare-event-images.mjs で作る） */
+export const EVENT_IMG = {
+  maffonFlyer: {
+    src: maffonFlyer,
+    alt: "告知画像。かたがみスタイル×maffon トレイシーTシャツ・フランダースカート ぬいぬいWORKSHOP。2026年11月27日（金）・28日（土）、10:00〜12:00 トレイシーTシャツ、14:00〜16:00 フランダースカート。27日はクロバーの実演も。両方でも片方でもOK",
+  },
+  maffonTracy: { src: maffonTracy, alt: "トレイシーTシャツの見本の着用写真。白いTシャツに、黒のワイドパンツを合わせている" },
+  maffonFlounder: { src: maffonFlounder, alt: "フランダースカートの見本の着用写真。カーキ地に黒の花柄のロングスカートに、白いトップスと帽子を合わせている" },
+  maffonTshirtFabric1: { src: maffonTshirtFabric1, alt: "レモン色と杢グレーの、リバーシブルのニット生地" },
+  maffonTshirtFabric2: { src: maffonTshirtFabric2, alt: "オフミントとアイボリーの、リバーシブルのニット生地" },
+  maffonTshirtFabric3: { src: maffonTshirtFabric3, alt: "ジェイブルーとアイボリーの、リバーシブルのニット生地" },
+  maffonTshirtFabric4: { src: maffonTshirtFabric4, alt: "アイボリーと杢グレーの、リバーシブルのニット生地" },
+  maffonTshirtFabric5: { src: maffonTshirtFabric5, alt: "杢グレーとネイビーの、リバーシブルのニット生地" },
+  maffonSkirtFabrics12: {
+    src: maffonSkirtFabrics12,
+    alt: "フランダースカートの生地。上はパズル柄（黒／アイボリー）、下はプティアンブレム柄（ネイビー／アイボリー）。どちらも表と裏の両面",
+  },
+  maffonSkirtFabrics34: {
+    src: maffonSkirtFabrics34,
+    alt: "フランダースカートの生地。上はクッカペロット柄（ネイビー／アイボリー）、下はダリア柄（ネイビー／シナモン）。どちらも表と裏の両面",
   },
 } satisfies Record<string, Img>;

@@ -15,6 +15,7 @@ import { Photo } from "@/components/ui/Photo";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { AccessBlock } from "@/components/sections/AccessBlock";
 import { ColumnCard } from "@/components/sections/ColumnCard";
+import { EventNotice } from "@/components/sections/EventNotice";
 import { FaqList } from "@/components/sections/FaqList";
 import { MachineTypeGrid } from "@/components/sections/MachineTypeGrid";
 import { Price } from "@/components/sections/PriceTables";
@@ -104,6 +105,9 @@ export default function HomePage() {
 
   return (
     <>
+      {/* 開催予定のイベントがあるときだけ、いちばん上に「イベントのお知らせ」 */}
+      <EventNotice />
+
       {/* ───────── 1. ヒーロー：実際のスペースの写真を大きく。黄色のラベルに名前と予約の入口をまとめる ───────── */}
       <section className="pinked bg-sun lg:pb-10">
         <div className="relative mx-auto max-w-[100rem]">

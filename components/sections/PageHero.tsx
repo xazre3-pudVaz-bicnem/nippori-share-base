@@ -20,6 +20,8 @@ type Props = {
   img?: Img;
   /** 写真の切り抜き位置 */
   position?: string;
+  /** 写真の縦横比（既定は横長。告知画像など、切り抜くと文字が欠ける画像は "aspect-square" など元の比率にする） */
+  ratio?: string;
   children?: ReactNode;
 };
 
@@ -28,7 +30,7 @@ type Props = {
  * （旧サイトの「黄色い帯＋大きな写真」を引き継ぐ）。帯の下端はピンキングばさみで切った布の形。
  * 写真は帯の中に収める（帯の下へはみ出させない）。PC では文章と写真の上下の中心をそろえる。
  */
-export function PageHero({ crumbs, en, title, sub, lead, img, position, children }: Props) {
+export function PageHero({ crumbs, en, title, sub, lead, img, position, ratio = "aspect-[4/3] lg:aspect-[5/4]", children }: Props) {
   return (
     <section className="pinked bg-sun">
       <div className={`mx-auto max-w-6xl px-5 pt-5 sm:px-8 ${img ? "pb-12 sm:pb-16 lg:pb-[4.5rem]" : "pb-14 sm:pb-20"}`}>
@@ -44,7 +46,7 @@ export function PageHero({ crumbs, en, title, sub, lead, img, position, children
             {lead ? <p className={`measure mt-5 text-balance text-[0.95rem] sm:text-base ${img ? "" : "mx-auto"}`}>{budou(lead)}</p> : null}
             {children ? <div className="mt-7">{children}</div> : null}
           </div>
-          {img ? <Photo img={img} priority swatch="cream" ratio="aspect-[4/3] lg:aspect-[5/4]" position={position} sizes="(max-width: 1023px) 100vw, 520px" /> : null}
+          {img ? <Photo img={img} priority swatch="cream" ratio={ratio} position={position} sizes="(max-width: 1023px) 100vw, 520px" /> : null}
         </div>
       </div>
     </section>

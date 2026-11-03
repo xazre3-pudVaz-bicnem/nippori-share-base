@@ -1101,7 +1101,8 @@
       "targetKeyword": "ハンドメイド ワークショップ 開き方",
       "titleIdea": "ハンドメイドのワークショップを開くには｜準備の進め方",
       "searchIntent": "初めてワークショップを主催する手順を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-03"
     },
     {
       "id": "workshop-fee-how-to-decide",

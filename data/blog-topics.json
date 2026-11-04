@@ -1261,7 +1261,8 @@
       "targetKeyword": "洋裁 用語 初心者",
       "titleIdea": "洋裁の用語｜型紙に出てくる言葉の意味",
       "searchIntent": "型紙や作り方に出てくる言葉の意味を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-04"
     },
     {
       "id": "what-is-cutting-machine",

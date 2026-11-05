@@ -55,7 +55,8 @@
       "targetKeyword": "ロックミシン 必要か",
       "titleIdea": "ロックミシンは必要？ジグザグ縫い・裁ち目かがりとの違い",
       "searchIntent": "ロックミシンを買うべきか、家庭用ミシンで足りるのか迷っている",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-05"
     },
     {
       "id": "machine-for-knit-fabric",

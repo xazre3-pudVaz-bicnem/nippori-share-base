@@ -769,7 +769,8 @@
       "targetKeyword": "洋裁 道具 必要なもの",
       "titleIdea": "洋裁に必要な道具｜最初にそろえるもの・あとでよいもの",
       "searchIntent": "洋裁を始めるのに何をそろえればよいか知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-07"
     },
     {
       "id": "first-sewing-project",

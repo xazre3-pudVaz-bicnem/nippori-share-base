@@ -499,7 +499,8 @@
       "titleIdea": "日暮里繊維街を初めて歩く人へ｜回り方と準備",
       "searchIntent": "初めて日暮里繊維街へ行く前に、回り方と準備を知りたい",
       "note": "個別の店名・営業時間・価格は書かない",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-08"
     },
     {
       "id": "how-to-choose-fabric-at-textile-town",

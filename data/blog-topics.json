@@ -79,7 +79,8 @@
       "targetKeyword": "厚物 ミシン 選び方",
       "titleIdea": "厚物を縫えるミシンの選び方｜帆布・デニム・合皮",
       "searchIntent": "厚い生地を縫えるミシンの条件を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-09"
     },
     {
       "id": "sewing-needle-size-guide",

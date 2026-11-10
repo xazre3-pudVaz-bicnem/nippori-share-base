@@ -91,7 +91,8 @@
       "targetKeyword": "ミシン針 番手 選び方",
       "titleIdea": "ミシン針の選び方｜番手と種類を生地に合わせる",
       "searchIntent": "生地に合うミシン針の番手と種類を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-10"
     },
     {
       "id": "sewing-thread-weight-guide",

@@ -571,7 +571,8 @@
       "targetKeyword": "生地 買い物 持ち物",
       "titleIdea": "生地を買いに行く日の持ち物",
       "searchIntent": "生地の買い物に持っていくと便利なものを知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-12"
     },
     {
       "id": "fabric-cut-by-length-basics",

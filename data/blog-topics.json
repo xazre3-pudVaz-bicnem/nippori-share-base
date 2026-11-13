@@ -785,7 +785,8 @@
       "targetKeyword": "洋裁 初心者 最初に作るもの",
       "titleIdea": "洋裁初心者が最初に作るなら？失敗しにくい題材",
       "searchIntent": "初めての洋裁で何を作るとよいか知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-13"
     },
     {
       "id": "cutting-fabric-with-pattern",

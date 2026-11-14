@@ -997,7 +997,8 @@
       "targetKeyword": "貸し会議室 作業 向かない",
       "titleIdea": "貸し会議室で作業するときに足りないもの",
       "searchIntent": "貸し会議室で制作をして困る点を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-14"
     },
     {
       "id": "try-shared-atelier-first",

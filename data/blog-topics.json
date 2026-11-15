@@ -103,7 +103,8 @@
       "targetKeyword": "ミシン糸 番手 選び方",
       "titleIdea": "ミシン糸の番手の選び方｜30番・60番・90番の使い分け",
       "searchIntent": "ミシン糸の番手の違いと選び方を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-15"
     },
     {
       "id": "thread-tension-troubleshooting",

@@ -1157,7 +1157,8 @@
       "titleIdea": "ワークショップの定員の決め方",
       "searchIntent": "何人まで受け入れられるかの決め方を知りたい",
       "note": "スペースの定員は確認できていないので書かない",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-16"
     },
     {
       "id": "workshop-pre-event-guide-for-participants",

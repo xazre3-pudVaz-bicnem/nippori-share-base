@@ -1318,7 +1318,8 @@
       "targetKeyword": "裁ちばさみ 選び方 手入れ",
       "titleIdea": "裁ちばさみの選び方と手入れ",
       "searchIntent": "裁ちばさみの選び方と長持ちさせる方法を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-17"
     },
     {
       "id": "tote-bag-first-project",

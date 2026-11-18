@@ -32,7 +32,8 @@
       "targetKeyword": "職業用ミシン とは",
       "titleIdea": "職業用ミシンとは？直線縫い専用のミシンでできること",
       "searchIntent": "職業用ミシンが何をするミシンで、家庭用と何が違うのかを知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-18"
     },
     {
       "id": "overlock-thread-how-to-choose",

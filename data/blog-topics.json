@@ -539,7 +539,8 @@
       "targetKeyword": "縫いやすい生地 初心者",
       "titleIdea": "初心者が縫いやすい生地・縫いにくい生地",
       "searchIntent": "最初に選ぶとよい生地を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-19"
     },
     {
       "id": "test-sewing-on-purchase-day",

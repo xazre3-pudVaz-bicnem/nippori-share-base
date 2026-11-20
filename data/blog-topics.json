@@ -127,7 +127,8 @@
       "targetKeyword": "ミシン まっすぐ縫う コツ",
       "titleIdea": "ミシンでまっすぐ縫うコツ｜目線・ガイド・速度",
       "searchIntent": "縫い目が曲がってしまうのを直したい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-20"
     },
     {
       "id": "sewing-machine-practice-for-beginners",

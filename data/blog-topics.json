@@ -835,7 +835,8 @@
       "targetKeyword": "編み会 とは",
       "titleIdea": "編み会とは｜持ち物と楽しみ方",
       "searchIntent": "編み会がどんな集まりで、何を持っていけばよいか知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-21"
     },
     {
       "id": "how-to-trace-patterns",

@@ -599,7 +599,8 @@
       "targetKeyword": "生地幅 種類",
       "titleIdea": "生地幅の種類｜シングル幅・ダブル幅・広幅",
       "searchIntent": "生地幅の呼び方と、用尺への影響を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-22"
     },
     {
       "id": "knit-fabric-types",

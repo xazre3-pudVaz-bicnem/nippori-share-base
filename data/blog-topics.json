@@ -45,7 +45,8 @@
       "titleIdea": "ロックミシンの糸の選び方｜種類・番手・色合わせ",
       "searchIntent": "ロックミシンにどんな糸を何本用意すればよいか知りたい",
       "note": "スペースの糸を使える Ito Share に触れてよい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-23"
     },
     {
       "id": "do-i-need-overlock",

@@ -1016,7 +1016,8 @@
       "targetKeyword": "アトリエ 借りる 前に",
       "titleIdea": "アトリエを借りる前に、シェアスペースで試す",
       "searchIntent": "自分のアトリエを持つ前に試せる方法を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-24"
     },
     {
       "id": "what-is-shared-atelier",

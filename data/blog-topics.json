@@ -1152,7 +1152,8 @@
       "targetKeyword": "ワークショップ 告知 方法",
       "titleIdea": "ワークショップの告知｜いつ・どこで・何を伝えるか",
       "searchIntent": "ワークショップの告知の進め方を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-25"
     },
     {
       "id": "workshop-capacity-how-to-decide",

@@ -438,7 +438,8 @@
       "targetKeyword": "生地 水通し やり方",
       "titleIdea": "生地の水通し・地直しのやり方",
       "searchIntent": "水通しが必要な生地と、やり方を知りたい",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-27"
     },
     {
       "id": "double-fold-hem-tips",

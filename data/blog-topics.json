@@ -805,7 +805,8 @@
       "titleIdea": "型紙どおりに裁断するコツ｜地の目・固定・印つけ",
       "searchIntent": "型紙を使った裁断でずれないコツを知りたい",
       "note": "既存の「大きな作業台で洋裁をするメリット」と重ならないよう、手順に絞る",
-      "used": false
+      "used": true,
+      "usedOn": "2026-11-28"
     },
     {
       "id": "pressing-in-sewing",
